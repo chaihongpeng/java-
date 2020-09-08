@@ -1,0 +1,3 @@
+https://cr.console.aliyun.com/cn-hangzhou/instances/mirrors
+
+在阿里云上按提示操作

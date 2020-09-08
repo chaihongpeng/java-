@@ -1,0 +1,7 @@
+我觉得有点像策略模式，
+在visitor实现计算折扣方法，
+将visitor传入到computer类的accept方法
+computer再将visitor传入到每一个computerPart类中
+由computerPart的accept1的方法调用visitor实现的折扣方法计算出价格，该方法再将价格写入到visitor的总价成员变量中
+最后调用visitor的getTotalPrice就可以得到一台电脑所有组件折扣后的总价格
+
