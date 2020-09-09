@@ -1,3 +1,0 @@
-shiro暂时
-github
-http
