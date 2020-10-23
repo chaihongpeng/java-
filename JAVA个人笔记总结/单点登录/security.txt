@@ -23,3 +23,20 @@
 		httpSecurity
 			.logout()
 				.logoutUrl("/logout")//等处请求路径
+				
+
+@EnableWebSecurity注解，用于配置security
+继承WebSecurityConfigurerAdapter修改配置类
+//用户认证的数据源，相当于Realm
+public void configure(AythenticationManagerBuilder auth){
+	auth.inMemoryAuthentication()//使用内存添加数据
+		.withUser("user")//账户
+		.password("{noop}1234")//密码,noop代表这是一份未加密数据
+		.roles("USER")//角色
+}
+//配置SpringSecurity相关信息
+configure(HttpSecurity http){
+	http..authorizeRequests()//配置权限
+		.antMatchers(/**).hasAnyRole("USER","ADMIN")//设置可以访问的角色
+		.anyRequest().authenticated()//其他资源必须认证才能访问
+}
