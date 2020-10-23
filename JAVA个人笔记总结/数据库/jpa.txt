@@ -1,0 +1,55 @@
+权限有问题
+
+
+@Table(name="表名")表名
+@Entity开启实体类
+
+@Id主键
+@GeneratedValue生成方式
+
+@Basic默认相当于添加了这个注解，自动映射
+
+@Column(name="列名"，length="长度"，nullable="false")精确映射
+
+@Transient标记不需要映射的数据
+
+@Temporal(Temporal.TIMESTAMP小时) DATE日期 指定Date类型数进行精确度
+
+
+//配置外键
+//声明关系
+@JoinColumn(name="关联外键"),referencedColumnName = ""参照主表的主键
+@OneToMany一对多
+Set set = new HashSet();
+
+
+//配置外键
+//声明关系
+@JoinColumn(name="外键列的列名")，referencedColumnName = ""当前主表主键的字段名
+@ManyToOne多对一
+OneObject obj;多对一对应的一对象
+
+//配置中间表
+//声明关系
+@JoinTable(name="中间表名称",
+			joinColumns={(name="",referencedColumnName="")},当前对象在中间表中的外键
+			invereJoinColumns={(name="",referencedColumnName="")},对方对象在中间表中的外键
+			)
+@ManayToMany
+
+
+save方法，更新或添加
+
+查询关键字findBy
+
+
+Specification动态条件查询
+	root:获取需要查询的对象属性，获取属性，root。get("属性名称，非字段名称")
+	query:
+	criteriaBuilder:构造查询条件,内部封装了很多查询方法，使用查询方法cb对象总有很多查询方式。例：cb.equal(root.get("name"),"比较值")
+	cb.and(条件1,条件2);返回此返回参即可联合查询
+
+
+
+对象导航查询
+@OneToMany(fetch=FetchType.EAGER)配置加载关系EAGER立即加载，LAZY延迟加载

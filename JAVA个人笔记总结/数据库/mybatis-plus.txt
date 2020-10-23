@@ -1,0 +1,11 @@
+@TableId(value="表名",type="id生成类型")在主键上加
+@TableName(value="表名")在表上加
+@TableField(value="指定数据库别名"
+			,exist="true查表时忽略该字段"
+			,select="false表示查询时是否查出该字段"
+			,fill="FiledFill.INSERT自动填充值")//完成该属性需要自定义MetaObjectHandler
+@Version乐观锁
+@TableLogic伪删除，要在配置文件中统一配置，所以在项目中不太好使用
+主键返回策略，mybatis-plus会自动的获取主键值
+
+insertAllColum()方法。不进行非空判断，将数据插入到数据库中

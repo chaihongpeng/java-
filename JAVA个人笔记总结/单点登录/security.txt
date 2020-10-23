@@ -1,0 +1,25 @@
+继承WebSecurityConfigerAdapter抽象类
+
+重写configure配置HttpSecurity的状态
+		httpSecurity.
+			.formLogin()//开启表单登录模式
+				.loginPage("/login.html")//跳转路径
+				.loginProcessingUrl("/login")//表单提交后的认证地址
+				.usernameParameter("userName")//默认表单的用户名
+				.passwordParameter("password")//默认的表单的密码
+				.successHandler()//执行自定义handler
+				.failureHandler()//执行自定义handler
+				.and()//使用and连接
+			.authorizeRequests()//配置权限
+				.antMatchers("/login","/login.html")//进行地址匹配
+				.permitAll()//所有的用户都可以任意访问
+				.antMatchers("/order")//进行地址匹配
+				.hasAnyAuthority("admin","user")//只有拥有admin角色或user角色的用户才可以访问的路径
+				.anyRequest()//除上面以外，剩余的全部请求
+				.authenticated()//执行改请求时，必须已经登录应用
+				.and()
+			.csrf().disable();禁用跨站攻击防御，否则无法登陆成功
+			
+		httpSecurity
+			.logout()
+				.logoutUrl("/logout")//等处请求路径
