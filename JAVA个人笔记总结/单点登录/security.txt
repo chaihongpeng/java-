@@ -85,8 +85,7 @@ DefaultLogoutPageGeneratingFilter 生成默认推出的认证页面
 
 BasicAuthenticationFilter 自动解析http头部Authentication,且以Basic开头的头信息
 
-UsernamePasswordAuthenticationFilter认证过滤器
-只接受post的form表单请求
+
 
 AbstractAuthenticationProcessingFilter successfulAuthentication认证成功之后的相关做法
 
@@ -103,6 +102,34 @@ Oauth2 用户操作A用户操作B，这是单点登录
 	授权码模式，A系统问用户是否可以操作B系统，注意：用户是有B的操作权限的，由用户给A授权
 	
 	简化模式：直接将访问B的同行令牌暴露在浏览器，省去门票的过程，B直接把令牌给A，A拿令牌去操作B
+	
+
+SpringSecurity认证器
+-->>>
+UsernamePasswordAuthenticationFilter认证过滤器
+判断必须为post请求
+从request中获取username,password
+认证前封装到这个对象里
+将用户名和密码封装到UsernamePasswordAuthenticationToken(principal,credentials)用户名，密码
+
+进行真正的认证逻辑，进入到这个方法当中去
+UsernamePasswordAuthenticationFilter.getAuthenticationManager().authenticate(authRequest);
+
+循环遍历认证方式集合List<AuthenticationProvider> providers，判断出适合的登录方式，如第三方登录
+
+默认会进入AbstractUserDetailsAuthenticationProvider认证器，authenticate
+
+认证器子类DaoAuthenticationProvider，retrieveUser真正认证操作
+
+this.getUserDetailsService().loadUserByUsername(username);返回内部的用户对象
+
+UserDetailsService,loadUserByUsername()也是一个需要实现的接口,这个UserDetailsService就是用户自己实现的service接口
+
+SpringSecurity过滤器
+-->>>
+springSecurityFilterChain这一个过滤器中执行了所有的spring过滤器
+
+
 
 
 
