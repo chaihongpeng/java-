@@ -3,8 +3,8 @@
 重写configure配置HttpSecurity的状态
 		httpSecurity.
 			.formLogin()//开启表单登录模式
-				.loginPage("/login.html")//跳转路径
-				.loginProcessingUrl("/login")//表单提交后的认证地址
+				.loginPage("/login")//请求被拦截后默认访问的路径
+				.loginProcessingUrl("/login")//表单提交后的认证地址,认证处理器的地址,处理器本身由SpringSecurity提供
 				.usernameParameter("userName")//默认表单的用户名
 				.passwordParameter("password")//默认的表单的密码
 				.successHandler()//执行自定义handler
@@ -12,7 +12,7 @@
 				.and()//使用and连接
 			.authorizeRequests()//配置权限
 				.antMatchers("/login","/login.html")//进行地址匹配
-				.permitAll()//所有的用户都可以任意访问
+				.permitAll()//所有的用户都可以任意访问，但是不跳过过滤器链
 				.antMatchers("/order")//进行地址匹配
 				.hasAnyAuthority("admin","user")//只有拥有admin角色或user角色的用户才可以访问的路径
 				.anyRequest()//除上面以外，剩余的全部请求
@@ -23,6 +23,8 @@
 		httpSecurity
 			.logout()
 				.logoutUrl("/logout")//等处请求路径
+
+
 				
 
 @EnableWebSecurity注解，用于配置security
@@ -41,16 +43,66 @@ configure(HttpSecurity http){
 		.anyRequest().authenticated()//其他资源必须认证才能访问
 }
 
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+可在类上或者方法上添加@Securd("ADMIN")给接口添加用户角色限制
 
 
-实现UserDetails接口，相当于Realm接口
+
+UserBean要实现UserDetails接口
 isEnabled当前用户是否可用....判断用户状态
 
+UserService要实现UserDetailsService接口
+实现loadUserByUserName的方法
+在方法内查询数据库
+返回UserDetails对象
+
+
+@ControllerAdvice
+在类上可以对页面的一场进行处理
+@ExceptionHandler(Exception.class)
+定义所要拦截并处理的异常
+AccessDeniedException
+
+
+vue的sso
+路由切换，第一次登录去找login页，全局拦截，存在cookie里
+每一个请求都携带什么，
+登录页面也要判断，成功存cookie。
+
+Vue动态菜单
+
+shiro想要扩展的东西
+
+
+
+spring security也有自己的像ioc容器 SecurityContextHolder容器，认证通过的操作对象
+
+
+
+DefaultLoginPageGeneratingFilter 生成默认登录认证页面
+
+DefaultLogoutPageGeneratingFilter 生成默认推出的认证页面
+
+BasicAuthenticationFilter 自动解析http头部Authentication,且以Basic开头的头信息
+
+UsernamePasswordAuthenticationFilter认证过滤器
+只接受post的form表单请求
+
+AbstractAuthenticationProcessingFilter successfulAuthentication认证成功之后的相关做法
+
+校验过滤器
+BasicAuthenticationFilter doFilterInternal方法来验证是否登录
 
 
 
 
+Oauth2 用户操作A用户操作B，这是单点登录
+用户操作A，A操作B这是Oauth2
 
+四种授权方式
+	授权码模式，A系统问用户是否可以操作B系统，注意：用户是有B的操作权限的，由用户给A授权
+	
+	简化模式：直接将访问B的同行令牌暴露在浏览器，省去门票的过程，B直接把令牌给A，A拿令牌去操作B
 
 
 
