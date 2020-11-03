@@ -154,8 +154,25 @@ AuthenticationSuccessHandler
 AuthenticationFailureHandler
 	onAuthenticationFailure(request,AuthenticationException authentication);
 
+自定义访问控制
+	http.access("@类.方法(参数，参数)")
+	方法返回true则有权限访问，返回false则无权限访问
+	
+	
+	
+@EnableGlobalMethodSecurity注解作用开启注解权限配置。每个注解都有自己开启权限的值
+一般卸载controller层上
+@Securd判断用户是否具有角色，ROLE_开头+角色名
+这个注解会先判断登录，登录后还是没有权限则会传回报错
+
+支持表达式access表达式
+@PreAuthorize操作执行前判断权限
+@PostAuthorize操作执行后判断权限(很少用)
 
 
+
+Basic Auth每次请求都带上用户名和密码
+session状态管理
 
 
 
