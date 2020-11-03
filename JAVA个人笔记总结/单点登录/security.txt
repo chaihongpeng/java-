@@ -131,6 +131,32 @@ springSecurityFilterChain这一个过滤器中执行了所有的spring过滤器
 
 
 
+UserDetailsService登录逻辑
+
+PasswordEncoder密码解析器
+	BCryptPasswordEncoder,推荐使用的实现类
+	
+	encode 加密方法
+	matches密码匹配
+	
+	
+自定义登录逻辑的时候，容器必须要有PasswordEncoder的实例
+在向容器中注入UserDetailsServcie实例
+
+
+自定义登录成功处理器（前后端分离版）
+AuthenticationSuccessHandler
+	onAuthenticationSuccess(request,Authentication authentication);
+	实现该接口方法，在方法中拿到request想前端发送json,authentication里面存放了登录信息
+配置类.successHandler(new AuthenticationSuccessHandler()的接口实现类)
+
+自定义登录失败处理器(前后端分离版)
+AuthenticationFailureHandler
+	onAuthenticationFailure(request,AuthenticationException authentication);
+
+
+
+
 
 
 
