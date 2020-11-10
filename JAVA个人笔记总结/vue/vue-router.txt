@@ -16,7 +16,7 @@ VueRouter({
 	router
 })
 
-嵌套路由，在route里嵌套children数组
+
 
 
 路由钩子
@@ -31,3 +31,21 @@ routes:[
 	}
 ]
 
+路由守卫：
+(
+	to，//即将进入的路由目标
+	from,//当前正要离开的路由目标
+	next//钩子的确认方法
+)
+=>{
+	next()//进入下一个钩子
+	next(false)//中断当前导航
+	next("/")//打断路由，跳转到其他路由
+	next(error)//终止路由，跳转到router.onError()注册过的回调
+
+}
+
+嵌套路由，在route里嵌套children数组
+router-view可以包含其他的router-view
+嵌套渲染组件需要在route中配置children
+嵌套path中以/开头会被当做跟路径
