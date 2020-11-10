@@ -1,3 +1,4 @@
+路由的成员：
 route一条路由
 {
 	path:"",
@@ -19,7 +20,7 @@ VueRouter({
 
 
 
-路由钩子
+路由钩子：
 全局路由守卫
 router.afterEach((to,from)=>{})
 路由独享守卫
@@ -49,3 +50,16 @@ routes:[
 router-view可以包含其他的router-view
 嵌套渲染组件需要在route中配置children
 嵌套path中以/开头会被当做跟路径
+
+
+路由跳转：
+标签路由:
+	<router-link><router-link>
+	to属性，跳转路径
+	type属性，默认渲染标签
+	replace无痕
+
+代码路由:
+	$router
+	$router.push()路由跳转
+	$router.replace()无痕跳转
