@@ -1,0 +1,33 @@
+route一条路由
+{
+	path:"",
+	component:""
+}
+一条路由由一个路径和一个组件组成一个对象
+
+
+routes一组路由
+[route]
+route数组组成一个routes
+
+
+router路由管理者
+VueRouter({
+	router
+})
+
+嵌套路由，在route里嵌套children数组
+
+
+路由钩子
+全局路由守卫
+router.afterEach((to,from)=>{})
+路由独享守卫
+routes:[
+	{
+		path:"",
+		component:"",
+		beforeEnter:""
+	}
+]
+
