@@ -1,0 +1,15 @@
+axios拦截器
+	请求拦截器
+		成功请求拦截器
+			请求时拦截登录
+			axios.interceptors.request.use(config=>{进入请求拦截器;return config;},err=>{请求失败方向;return err;})
+		失败请求拦截器
+	响应拦截器
+		成功请求拦截器
+			响应时数据处理
+			axios.interceptors.response.use(config=>{进入请求拦截器;return config;},err=>{请求失败方向;return err;})
+		失败请求拦截器
+		
+		
+axios的全局配置
+	

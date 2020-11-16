@@ -1,0 +1,5 @@
+etcdctl put K V
+etcdctl get K	-w json 输出json格式
+etcdctl watch
+	--prefix 模糊匹配，指定前缀
+etcd也支持事务

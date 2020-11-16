@@ -1,0 +1,57 @@
+常用命令:
+	查看版本号nginx -v
+	启动nginx
+	关闭nginx -s stop
+	重启nginx -s reload
+
+	
+配置文件：
+	全局块：在events之前的部分都叫全局块
+		worker_processes 1; //nginx并发处理的数量
+		
+	events块：影响nginx服务器与用户网络的连接
+		worker_connections 1024; //nginx支持最大连接数
+	
+	http块：代理、日志、缓存
+		全局块：
+		upstream myserver{//负载均衡服务器的列表
+			ip_hash;
+			server 127.0.0.1 weight=1;
+			server 192.168.103.2 weight=1;
+		}
+		
+		server块：
+			全局server：
+				listen 80; //nginx监听端口号
+				server_name 127.0.0.1; //主机地址
+			
+			location块：//location + / 请求路径，支持正则表达式
+				proxy_pass http://127.0.0.1:8080 //转发路径
+				#proxy_pass http://myserver //默认负载均衡
+			
+配置反向代理：
+配置负载均衡：
+	http:
+		upstream myserver{
+			server 127.0.0.1;
+		}
+配置动静分离：
+	请求html，css,image等静态文件
+	设置浏览器缓存，指定过期时间，浏览器只需要确认静态文件的id是否和服务器上的一样来确认文件是否被更新过
+	http:
+		server:
+			location /www/{
+				alias /data/; //通过访问/www/就可以访问到/data/路径下的文件
+				index index.html index.html;
+			}
+			location /image/{
+				root /data/; //通过访问/image/就可以访问到/data/image/路径下的文件
+				autoindex on;//可以列出目录
+			}
+				
+		
+配置nginx集群：
+	keepalived相当于路由，负责监视nginx是否该宕机，实现宕机后的自动切换
+		
+
+

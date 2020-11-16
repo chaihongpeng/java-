@@ -1,0 +1,48 @@
+默认我们只配置了
+DelegatingFilterProxy的过滤器
+
+	initDelegating();//正真封装执行springsecurity过滤器链的方法
+		获取一个FilterChainProxy对象
+	
+	invokeDelegating();//只是执行下一个过滤器链
+	
+	
+	
+	
+	
+	FilterChainProxy
+		获取到
+		SecurityFilterChain
+			impelements
+				DefaultSecurityFilterChain
+				获取到filter集合，此对象存储所有的SpringSercurity的过滤器链
+				
+
+
+DelegatingFilterProxy是sercurity的入口函数
+
+DefaultSecurityFilterChain封装所有过滤器集合
+常用的容器
+SecurityContextPersistenceFilter第一个过滤器，主要维护securityContext的容器，给后续的过滤器使用
+WebAsyncManagerInterationFilter整合到spring异步执行的过滤器
+HeaderWriterFilter向请求头部添加响应的信息
+CsrfFilter跨域伪造请求的拦截过滤器
+LogoutFilter登出过滤器
+UsernamePasswordAuthenticationFilter认证操作的过滤器
+DefaultLoginPageGeneratingFilter默认的登录页面
+DefaultLogoutPageGeneratingFilter默认的登出页面
+BasicAuthenticationFilter自动头部带有Authentication且以Basic开头的头信息
+RequestCacheAwareFilter用于缓存httpServletRequest
+SecurityContextHolderAwareRequestFilter对象里面维护了securityContext容器，对servletContext的封装
+AnonymousAuthenticationFilter匿名登录，会创建匿名用户到Holder容器中
+SessionManagementFilter限制一个用户开启多个会话的数量
+ExceptionTranslationFilter处理异常的过滤器
+FilterSecurityInterceptor真正授权的过滤器
+
+
+
+
+
+
+
+
