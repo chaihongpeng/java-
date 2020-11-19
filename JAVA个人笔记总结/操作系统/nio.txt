@@ -77,10 +77,15 @@ inode抽象想象一个id,每一个文件都有一个inode号。
 					p管道pipeline
 					eventpoll表示内核提供的epoll内存区域
 
+lsof显示进程打开了哪些文件
 
+任何程序都有0 1 2
+0标准输入
+1标准输出
+2报错输出
 
-
-
+system.call系统调用
+int 0x80
 
 
 
