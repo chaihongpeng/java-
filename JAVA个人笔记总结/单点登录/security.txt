@@ -184,6 +184,18 @@ springSecurity有授权范围
 
 
 
+springsecurity跟过滤器
+	springSecurityFilterChain
+	DelegatingFilterProxy类名
+
+
+核心配置文件，离开后不能正常运行
+
+
+http.addFilterBefore(filter, filter.class);把一个过滤器加在另外一个过滤器的前面
+http.addFilterAt(filter,filter.class);用新的过滤器覆盖源来的过滤器
+	
+
 
 
 
