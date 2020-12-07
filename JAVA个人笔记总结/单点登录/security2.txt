@@ -41,6 +41,10 @@ FilterSecurityInterceptor真正授权的过滤器
 
 
 
+GenericFilterBean继承Filter
+OncePerRequestFilter集成GenericFilterBean，确保过滤器只执行一次，因为版本问题，过滤器可能会执行多次
+AbstractRequestLoggingFilter继承OncePerRequestFilter
+
 
 
 
