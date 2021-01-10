@@ -1,7 +1,7 @@
 默认我们只配置了
 DelegatingFilterProxy的过滤器
 
-	initDelegating();//正真封装执行springsecurity过滤器链的方法
+		();//正真封装执行springsecurity过滤器链的方法
 		获取一个FilterChainProxy对象
 	
 	invokeDelegating();//只是执行下一个过滤器链
@@ -39,6 +39,75 @@ SessionManagementFilter限制一个用户开启多个会话的数量
 ExceptionTranslationFilter处理异常的过滤器
 FilterSecurityInterceptor真正授权的过滤器
 
+
+
+GenericFilterBean继承Filter
+OncePerRequestFilter集成GenericFilterBean，确保过滤器只执行一次，因为版本问题，过滤器可能会执行多次
+AbstractRequestLoggingFilter继承OncePerRequestFilter
+
+
+.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);设置springsecurity对session的使用，SessionCreationPolicy.STATELESS为从不创建session，也不使用已存在的session
+
+
+springsecurity认证过程：
+登录请求进入到
+UsernamePasswordAuthenticationFilter中处理的
+	doFilter在父类的AbstractAuthenticationProcessingFilter中实现，
+	首先父类只判断只接受post请求
+	调用子类attemptAuthentication方法，主要目的就是接受表单数据，查数据库，*1封装到Authentication当中取
+		*1首先后去前台的resquest请求中的用户名和密码，封装到UsernamePasswordAuthenticationToken当中
+		setDetails就是把我们请求中的一些信息设置到UsernamePasswordAuthenticationToken当中
+	authenticationManager中调用我们实现的的userDetails来做身份认证
+	调用SessionAuthenticationStrategy的onAuthentication方法配置session策略
+	
+	
+	
+	认证失败后catch异常，unsuccessfulAuthentication()调用handler的onAuthenticationFailure方法
+	认证成功，就调用successfulAuthentication方法
+未认证
+AuthenticationManager
+委托
+AuthenticationProvider
+关联
+UserDetailsService
+返回
+UserDetails
+认证
+Authentication
+
+
+第二讲：
+关于UsernamePasswordAuthenticationToken是什么？
+UsernamePasswordAuthenticationToken中的内容
+UsernamePasswordAuthenticationToken有两个构造方法，第一个未认证，第二个已认证，构造方法
+setAuthenticated为true标识已经认证，设置为false表示未认证
+这个UsernamePasswordAuthenticationToken实现了Authentication接口
+实现这个接口的类就要有获取用户信息，用户权限，用户密码，是否被认证。这几个功能。
+
+第三讲：
+AuthenticationManager接口是做什么的？
+他只规定了一个方法authenticate
+他的实现类ProviderManager
+
+这个接口方法接受了token对象
+
+----------------------------------------------------------------------------
+
+问题springsecurity所有的权限控制方法
+hasAuthority必须有权限
+hasAnyAuthority有其中一个权限即可
+hasRole基于角色权限
+hasAnyRole拥有其中一个角色即可
+
+必须是spring容器中的对象
+access("@ClassName.Method()")
+
+注解权限控制，默认未开启
+@EnableGlobalMethodSecurity(sercuredEnabled = true)注解开启注解调用
+@Secured判断用户是否具有角色
+
+@PreAuthorize访问方法在访问前先判断权限
+@PostAuthorize操作结束后判断权限，很少用
 
 
 

@@ -184,8 +184,27 @@ springSecurity有授权范围
 
 
 
+springsecurity跟过滤器
+	springSecurityFilterChain
+	DelegatingFilterProxy类名
 
 
+核心配置文件，离开后不能正常运行
+
+
+http.addFilterBefore(filter, filter.class);把一个过滤器加在另外一个过滤器的前面
+http.addFilterAt(filter,filter.class);用新的过滤器覆盖源来的过滤器
+	
+	
+FilterSecurityInterceptor用户尚未登录时的拦截器，和用户权限的拦截器
+
+
+
+
+UsernamePasswordAuthenticationFilter 负责拦截登录请求，然后封装成Authentication
+Authentication 封装了用户名，密码权限等信息，isAuthenticated()方法来决定该Authentication认证成功没;
+AuthenticationManager 认证管理器，负责调度;
+AuthenticationProvider 认证提供者，负责和数据库做比对，成功后返回成功的Authentication;
 
 
 
