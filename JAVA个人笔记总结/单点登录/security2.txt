@@ -110,6 +110,22 @@ access("@ClassName.Method()")
 @PostAuthorize操作结束后判断权限，很少用
 
 
+=========================================================================================================================
+FilterSecurityInterceptor授权过滤器
+ExceptionTranslationFilter处理异常过滤器
+UsernamePasswordAuthenticationFilter登录认证过滤器，只支持post的表单提交
+
+DelegatingFilterProxy函数入口
+
+==>获取到 FilterChainProxy
+	===>获取所有要加载的过滤器，获得过滤链
+	
+	
+	UserDetailsService
+	
+	AuthenticationEntryPoint未授权统一处理类
+
+
 
 
 
