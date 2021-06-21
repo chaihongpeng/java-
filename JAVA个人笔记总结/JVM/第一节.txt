@@ -1,0 +1,221 @@
+java从编码到执行的过程
+
+java从编码到执行过程
+xx.java --> javac --> xx.class
+
+xx.class && java类库 -->ClassLoader -->字节码解释器 -->执行引擎
+
+jvm与java无关，任何语言只要能编辑成为class文件，就可以被jvm执行
+
+jvm是一种规范，拥有具体的实现
+hotspot
+
+(((jvm)jre)jdk)
+
+
+magic[4]
+minor version[2] magor version[2] class文件的版本号
+constant_pool_count[2]常量池常量数量
+
+access_flags[2] class文件的访问权限类型(public,final,enum,interface等)
+
+
+
+class文件如何到内存当中
+Loading 
+Linking:{
+	verfication:校验xxx.class符不符合class文件的标准
+	preparation:静态变量赋默认值,！！注意默认值不是实际的初始值
+	resolution:常量池的符号引用转化为内存地址
+}
+Initializing:静态变量赋值初始值！！此时静态变量才有本来的值；调用静态代码块
+
+
+JVM的类加载器(ClassLoader)
+类加载器本身是一个普通的class;jvm中的所有class都是通过类加载器加载到内存的
+
+Class对象，一个xxx.class文件被load到内存后，生成两块内容，1.二进制代码放入内存中；2.生成一个class类的对象，class对象指向二进制文件；
+	当我们调用方法时，会通过Class类对象间接调用二进制码指令
+	
+	
+类加载器层次
+	BootStrap:lib/rt.jar charset.jar  String,Object,C++实现的加载器
+	Extension:加载扩展包里的文件jre/lib/ext/*/jar
+	App:用于加载classpath里的内容，也就是我们自己写的文件
+	Custom ClassLoader:自定义加载器，开发者想加载哪里的文件就加在哪里的文件
+	
+双亲委派机制：从底至上去查找类是否已经被加载，如果没有加载则区父加载器查找，如果Bootstrap没有则一次从顶至下委派给下一级看是否有能力加载
+	为什么使用双亲委派机制？
+		为了安全，如果没有双亲委派机制，自定义加载器如果能加载并覆盖父加载器已有的类，造成隐患
+
+父加载器不是类加载器的加载器，也不是类加载器的父类加载器
+
+
+自定义类加载器
+	如何使用现有的类加载器加载类到内存当中？
+		ClassLoader的loadClass方法，返回Class类对象
+	什么时候需要我们去加载一个Class?
+		动态代理生成一个新的class，这是就会load到内存当中，热部署也是手动替换已有的类对象
+	如何自定义类加载器？
+		继承ClassLoader,重写findClass方法，将xxx.class通过流获取二进制内容，使用继承的defindClass方法将二进制转化为Class对象
+		
+		
+Linking:
+	Verification:对文件格式进行校验
+	Perparation:给静态变量赋默认值
+	Resolution:解析，它会把类、方法、属性的符号引用解析为直接引用
+	
+	
+Initializing:
+	用类初始化代码时，给静态变量赋上初始值
+	
+	new对象过程中，成员变量的赋值步骤：1.给对象申请内存，成员变量先赋默认值，在调用构造方法，给赋初始值
+	
+	
+	
+
+JAVA的内存模型
+	硬件并发基础:
+		CPU内部:{
+			L0:寄存器
+			L1:高速缓存
+			L3:高速缓存
+		}
+		CPU共享:{
+			L3:高速缓存
+			L4:主存
+			L5:磁盘
+			L6:远程文件存储
+		}
+		
+	什么事总线锁？
+		就是让cpu暂时无法访问L3的一把锁，解决cpu一致性问题的开山斧
+		
+	MESI一致性协议原理？
+		把每一个缓存内容进行标记，缓存内容与主存相比是否有过更改，如果我自身更改过则标记为Modified;独享Exclusive; 有别人在读Snared;我读的时候别的cpu改过了Invalid;
+		无法被缓存的数据或跨越多个缓存的大数据，则无法用缓存一致性协议解决，因此还需要总线锁来解决;
+		
+		
+	什么是缓存行cache line(目前多数为64bytes)？
+		当我们需要读一个数据时，计算机会把临近的数据一并读到缓存中
+		
+	乱序问题，为什么会发生乱序？
+		cpu同时读进来多条语句，其中有指令需要向内存申请数据，cpu为了不继续等待会先去执行他下面的其他指令。前提是两条指令没有依赖关系
+		
+		cpu和L1之间还存在一个WC缓存，为了提升cpu和L2写数据，合并写的缓存
+		
+		
+	硬件层面如何保证指令的有序性？
+		cpu级别的内存屏障,屏障两侧的指令不可以重排，读屏障，写屏障，所有屏障
+		sfence(save fence),lfence(load fence),mfence(all fence)
+		
+	volatile的底层实现
+	java指令-->bytecode字节码-->jvm层级实现-->操作系统实现
+	
+	字节码也只是一个volatile
+	-->jvm级别在volatile前后添加了内存屏障StoreStoreBarrier,StoreLoadBarrier(写操作)  LoadLoadBarrier,LoadStoreBarrier(读操作)
+	-->硬件层面实现，不同系统不同实现
+	
+
+synchronized实现细节
+
+	字节码实现MONITORENTER、MONITOREXIT
+	jvm的实现，C和C++实现的
+	硬件层面的实现，各种lock指令
+	
+	
+	
+对象的创建过程
+	解释一下对象的创建过程？
+		加载类的过程
+		class loading-->class linking--->class initializing
+		
+		new Object 的过程
+		申请内存，成员变量赋默认值，调用构造方法，成员变量赋初始值，调用构造方法里的语句
+		
+	对象在内存中的存储布局？
+		对象的大小和虚拟机的设置关系很大
+		UsepressedOops
+		作为对象的内存布局分为两种，一种是普通对象，一种是数组对象。
+			普通对象
+				第一块：对象头8个字节markword
+				第二块：ClassPointer指针，指针指向CLass对象
+				第三块：实例数据instance
+				第四块：对齐padding
+	
+	
+			数组对象
+				对象头
+				ClassPointer指针，指针指向CLass对象
+				数组长度
+				数组数据
+				对齐
+		
+		
+		
+		对象各部分块的具体内容
+			markword对象头的大概介绍
+			8个字节64位，对象状态不同，内存分配也不同
+			
+			大概记住：两位锁定信息，GC标记：分代年龄
+			
+			无锁状态：2字节的锁标志01;4字节的分代年龄;1字节的偏向锁0;25字节的hashcode
+			
+			分代年龄因为只有四个字节，所以年龄最大15代
+		
+		对象定位
+			句柄池: T t = new T(); t指向句柄池的两个指针，一个指针指向class，另一个指向对象
+			直接指针：直接指向对象，对象在指向CLass对象
+			
+		
+		
+	对象是怎么分配的？
+		如果栈能分配的下，尝试在栈上分配，栈弹出时对象就没了；
+		如果栈上分配不下，个头特别大，直接分配到堆内存
+		如果个头不大，就进行线程本地分配，分配的下就分配，分配不下找伊甸园区；进行GC过程，GC年龄到了就进入到老年代
+		
+		
+		
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		
+	
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	

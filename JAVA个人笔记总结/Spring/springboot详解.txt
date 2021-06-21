@@ -1,0 +1,134 @@
+springboot是一个构建和快速运行所有spring程序的启动器
+
+spring的优点
+	简化开发
+	基于pojo的最小轻量级和最小倾入性编程
+	IOC实现依赖注入和面向接口的松耦合
+	基于AOP和惯例进行声名式编程
+	通过切面和模板减少样式代码
+
+springboot优点
+	为所有spring开发者提供更快入门程序
+	开箱即用，提供各种默认配置简化项目配置
+	内嵌式容器简化web开发
+	没有冗余代码生成和xml配置的要求
+	
+springboot的pom文件
+parent父依赖
+
+web:
+	内建tomcat或者jetty
+test:
+	测试模块
+	
+@SpringbootApplication：springboot的启动类注解
+@ComponentScan：包扫描路径
+
+
+JDK注解,java5引入的新特性，注解最根本的原理是反射
+	四个原属性
+	@Target(ElementType.TYPE)
+		描述注解的使用范围，是类上、方法上、变量上
+		TYPE类、接口
+		FIELD变量
+	@Retention
+		表示在什么级别保存该注解信息
+		Source<Class<Runtime
+	@Doucumented:该注解是否包含在
+自定义注解的事项
+	
+	
+！！！SPI的实现
+
+springboot配置文件：
+	@ConfigurationProperties
+		支持批量配置文件属性
+		支持松散绑定(松散语法)
+		不支持SpEL
+		支持JSR303
+		支持复杂类型封装
+	@Value
+		一个个指定
+		不支持松散语法
+		支持SpEL
+		不支持JSR303
+		不支持复杂类型封装
+
+配置文件根据所在位置的生效的优先级：
+	file:/config
+	file:/
+	classpath:/config/
+	classpath:/
+	
+springboot的服务器嵌入
+	可以使用spring-boot-start-web搭建模块快速运行
+	也可以使用spring-boot-start-webflux构建响应式应用程序
+	
+springboot内嵌servlet容器支持
+通过@WebServlet简化web.xml的配置
+在启动类里添加@ServeletComponentScan启动Servlet扫描
+
+注册一个bean：
+	bean = new ServletRegistrationBean(<我们自己定义的servlet对象>、"<请求路径，优先级大于serlet自身的注解配置>")
+	bean.setLoadOnStartup(1);//设置启动时机
+	return bean;
+	
+	
+过滤器
+监听器
+	可以监听session,servletContext,servletRequest等域对象
+
+SpringMVC自动注册了Converter和Formatter，该功能可以将前端字符串自动转化为对象、格式化数据
+
+如果你想保留Spring MVC的功能，并添加其他MVC配置，拦截器、格式化器、视图控制器
+可以添加自己的WebMvcConfigurerAdapter类型的@Configuration类，但是不能带上@EnableWebMvc注解，带上这个标签后则代表用户完全掌控了springmvc则Springboot不在起作用
+RequestMappingHanlerMapping、RequestMappingHanlerAdapt、ExceptionHandlerExceptionResovler
+	
+springboot对数据库的连接
+	配置数据源
+		spring.datasource.type:<应用数据源：com.alibaba.druid.pool.DruidDataSource>
+		德鲁伊有些配置属性不能被直接使用，需要配置数据源
+		德鲁伊数据源，通过获取properties文件进行配置文件的读取
+		
+	德鲁伊监控需要log4j的依赖
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,15 @@
+所有的集合都实现collection接口，但是map并不包含在collection中
+
+Map接口,map是一种kv键值对的映射关系
+
+api文档
+https://tool.oschina.net/apidocs/apidoc?api=jdk-zh
+
+
+实现子类
+	HashMap:哈希表，k和v都允许为空
+		HashTable:k和v都不允许为空，HashTable是线程安全的，实现原理为添加了synchronized关键字
+	LinkedHashMap:链表
+	TreeMap:红黑树
+	
+	

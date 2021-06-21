@@ -1,0 +1,82 @@
+client
+server
+存储引擎
+
+
+连接器：用户向mysql server 发送连接请求，密码匹配
+分析器：
+sql语句就是一个字符串，把sql语句进行切分，最后转化为AST抽象语法树
+优化器：RBO，CBO两种优化器
+执行器：与存储引擎进行挂钩
+
+！！！mysql8.0以前在server中还有查询缓存，8.0以后已经废弃
+
+我们大部分的优化就是在分析器和执行器之间
+
+
+
+mysql的性能监控工具
+	set profiling = 1;
+
+	show profiles;
+	查看sql语句的执行时间
+
+	show profile for query <n>;
+	查看第n条sql执行各个环节的执行时间
+	show profile cpu;
+	查询用户和系统使用cpu的具体数据
+
+	！！！show profile在未来版本可能会被替换
+
+
+	performance_schema工具使用
+	
+	该数据库中的数据存储在内存中，不会进行持久化
+	
+	
+schema与数据类型优化
+	更小的更好，正确使用数据类型
+	简单就好，整形比字符串操作代价更低,能用int就不是varchar
+	避免使用null,数据库里null == null 返回false;用is not null;
+	!!!慎重使用特殊值当默认值
+实际细节
+	整形类型tinyInt,smallInt,mediumInt,Int,bigInt;
+	分别占用8位，16位，24位，32位，64位；所以尽量挑小的
+	
+	字符和字符串类型char,varchar,text,blob
+	varchar：可变长度，存文章，更新不频繁，保存汉字特殊字符
+	char：最大长度255,会删除末尾的空格，检索效率更高，要求长度波动不大，短字符串
+	
+	时间类型datetime,timestamp,date
+	datetime:8个字节，与时区无关，数据库底层时区配置对datetime无效
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	

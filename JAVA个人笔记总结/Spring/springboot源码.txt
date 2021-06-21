@@ -1,0 +1,26 @@
+SpringAppliation
+	通过java主函数启动spring应用程序
+	步骤：
+		1.创建ApplicationContext对象
+		2.注册一个CommandLinePropertySource，启动时指定命令行参数
+		3.刷新应用上下文环境，加载所有的单例bean
+		4.触发所有的bean
+	
+
+源码跟踪：
+	Set primarySources = {
+		*1 main.class
+	}
+	WebApplicationType = {
+		*2 servlet.webApplicaitonType
+	}
+	
+	run(main.class);
+	 new SpringAppliation().run();
+		构造方法
+			*1创建LinkedHashSet集合并把主函数放入到集合对象
+			*2创建webApplicationType对象，对当前应用程序是响应式还是Servlet的判断
+			getSpringFactoriesInstances(ApplicationContextInitializer.class);获取spring的工厂实例
+				SpringFactoriesLoader.loadFactoryNames(type, classLoader)
+					读取META-INF/spring.factories Enumeration<URL> urls = (classLoader != null ? classLoader.getResources(FACTORIES_RESOURCE_LOCATION) : ClassLoader.getSystemResources(FACTORIES_RESOURCE_LOCATION));
+					cache.put();把读取的spring.factories的内容缓存起来

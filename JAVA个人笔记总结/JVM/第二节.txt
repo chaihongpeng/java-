@@ -1,0 +1,155 @@
+Run Data Area运行时数据区
+Instructions指令集
+
+i = i++;的问题？
+=====================
+
+运行时的内存区域
+	pc(Program Counter)存放下一条指令位置的区域
+	堆：Heap
+	jvm栈：JVM stacks
+		栈针：frame
+	本地方法栈：native method stacks
+	直接内存：Direct Memory(NIO的零拷贝)
+	方法区：method area
+		Class
+		常量池
+	
+	
+PC:
+	每一个虚拟机的线程都有他自己的计数器
+
+JVM stacks:
+	jvm栈也是线程独享区，栈里装的frame栈针
+
+Heap:
+	线程共享，堆
+	
+Method Area 方法区线程共享
+	每一个Class的结构
+	Run-Time Constant Pool：常量池
+	
+	方法区是个概念，他在1.8之前的实现是Perm Space永久区，1.8以后Meta Space元数据区
+	
+	
+=========================
+栈针Frame
+	Local Variables局部变量表
+	Operand Stacks操作数栈
+	dynamic linking动态链接，指到运行时常量池Class对象，获取方法的名称，方法类型(例如a方法调用了b方法，b方法代码就在常量池里寻找)
+	return address返回值地址，a()调用b();方法b()执行完毕后要返回的位置
+	
+	
+	每一个方法都对应一个栈针
+	int i = 8;的操作
+	
+	操作数栈
+	bipush <n>:
+		push byte
+		数据n压栈
+	istore_<n>:
+		store int into local varialbe
+		把栈里数据出栈，放入到下标为n的局部变量表
+		
+	i = i++;的操作
+	
+	操作数栈
+	iload <n>
+		从局部变量表中拿值进行压栈
+	iinc <n> by <m>
+		把局部变量表中为n的数加m
+	istore <n>
+		把栈中的值拿出赋值到局部变量表中为n的位置
+		
+		
+	sipush <n>
+		push short
+		将short类型数据压入栈
+	
+	
+	！！！非静态方法中，局部变量表默认会存一个this
+	
+	iadd
+		从操作数栈中拿出两个int类型进行相加，把结构扔到栈顶上
+		
+	
+	new
+		分配内存在堆内存，对象的地址会进行压栈，这是对象中的值都是默认值
+	dup
+		复制一份在栈内，这个指令在new对象过程中是为了让invokespecial时用掉一个准备
+	invokesepcial
+		执行特殊方法，执行构造方法，这个时候才赋初始值，并执行构造方法，栈中的引用就会弹出一个
+	astore <n>
+		从操作数栈中弹出数据，赋值给局部变量表下标为n的变量
+		
+		
+	pop
+		弹栈
+		
+	icount <n>
+		把数据n压栈
+	if_icmpne
+		if compare not equal
+		一次弹栈连个数，比较如果不等于
+		
+	!!!invoke方法执行后的返回值会放到操作数栈的顶部
+	
+	
+	jvm虚拟机的invoke指令详解
+		invokeStatic调用静态方法
+		invokeVirtual普通调用方法，自带多态；它会弹出操作数栈中的对象，弹出是谁就调用谁的方法，所以自带多态
+		invokeSepcial调用可以直接定位不需要定位的方法；调用private和构造方法时使用
+		invokeInterface通过接口调用方法
+		invokeDynamic在1.7之后，支持动态语言和lombok时使用
+		
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	
