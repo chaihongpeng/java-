@@ -1,0 +1,74 @@
+put请求必须具有幂等性
+put /[索引名]创建索引
+
+
+post没有幂等性
+post /[索引]/[数据] 创建数据，这会随机生成id
+	自己定义id
+post/[索引]/[数据]/[主键id]
+
+查询数据
+get/[索引]/[数据]/[id]
+
+查询索引下的所有数据
+get/[索引]/[_search]
+
+数据修改
+put/[]/[]/
+
+删除数据
+delete /[索引]/[_doc]/[主键]
+
+条件查询
+get /[index]/[_search]?q=[主键]:[内容]
+
+引入pom
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+</dependency>
+
+写yml
+elasticsearch:
+  host: 127.0.0.1
+  port: 9200
+
+
+
+写配置类
+@Configuration
+@ConfigurationProperties(prefix = "elasticsearch")
+@Data
+public class ElasticSearchConfig extends AbstractElasticsearchConfiguration {
+    private String host;
+    private Integer port;
+    @Override
+    public RestHighLevelClient elasticsearchClient() {
+        RestClientBuilder builder = RestClient.builder(new HttpHost(host, port));
+        RestHighLevelClient restHighLevelClient = new RestHighLevelClient(builder);
+        return restHighLevelClient;
+    }
+}
+
+写DAO
+@Repository
+public interface Dao extends ElasticsearchRepository<User,String> {
+
+}
+
+
+实体类映射
+@Data
+@ToString
+//索引名称 主分片 副本
+@Document(indexName = "product", shards = 3,replicas = 1)
+public class User {
+    @Id
+    String id;
+    //文本类型
+    @Field(type = FieldType.Text)
+    String name;
+    @Field(type = FieldType.Keyword)
+    String age;
+    String description;
+}
