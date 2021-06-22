@@ -1,0 +1,152 @@
+account用户表
+
+role表
+	id
+	name角色名称不能重复
+	add_account谁创建的
+	create_time创建时间
+	last_update_time最后更新时间
+	last_update_account最后更新人
+	is_delete是删除
+
+account_role中间表关联账户和角色
+	id
+	account_id
+	role_id
+	
+role_permission
+	id
+	role_id
+	permission_id
+	
+permission,也可以用|做分隔号
+	name
+	url
+	c
+	r
+	u
+	d
+	
+性能问题可以跑job，写到新的表里
+
+
+配置类
+@Configuration
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(securedEnabled = true)//开启注解授权
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+    @Autowired
+    private UserService userService;
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+    //授权
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests()
+                .antMatchers("/").permitAll()
+                .antMatchers("/").hasAuthority("admin")
+                .antMatchers("/").hasRole("");
+    }
+    //认证
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userService).passwordEncoder(passwordEncoder());
+    }
+}
+
+User类
+package com.colin.lesson.bean;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class User implements UserDetails {
+    String username;
+    String password;
+    private List<Role> roles;
+
+    @JsonIgnore
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
+    }
+}
+
+Role类
+package com.colin.lesson.bean;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
+import org.springframework.security.core.GrantedAuthority;
+
+@Data
+public class Role implements GrantedAuthority {
+    private Long id;
+    private String name;
+    private String description;
+
+    @JsonIgnore //防止json序列化时使用方法名序列化
+    @Override
+    public String getAuthority() {
+        return name;
+    }
+}
+
+
+Service类
+@Service
+public class UserService implements UserDetailsService {
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Override
+
+    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+        //根据username查询数据库
+        //根据查询的对象比较密码
+        //返回用户对象
+        ArrayList<Role> roles = new ArrayList<>();
+        return new User("admin", passwordEncoder.encode(""),roles);
+    }
+}
+
