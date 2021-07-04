@@ -1,0 +1,25 @@
+数据库不适合跑到docker里,强调性能的服务不适合使用docker(docker通常使用在测试环境中使用)
+一次创建和配置，处处运行
+
+docker和client是通过http通讯的可以远程
+
+client--> docker_host--> register
+
+tomcat的容器内部结构
+	linux-->jdk-->apache tomcat
+
+
+hub.docker.com官方的远程镜像仓库
+
+docker默认存放路径
+	/var/lib/docker
+		/image [存放镜像]
+		/containers [存放容器]
+		
+		
+镜像分层概念
+镜像属于只读文件，无法被修改，所以在创建时会生成临时容器
+所以每一个步骤执行，就会产生临时容器的系统快照
+这样的好处如果我们在构建新版本的容器时，构建命令和以前的相同的部分就可以使用以前缓存的容器
+
+centos容器在创建完成以后就默认进入退出的状态，需要使用-it进入交互模式，访问centos的/bin/bash命令，根据需求添加-d进入到后台运行模式

@@ -1,0 +1,43 @@
+dockerFile镜像的描述文件
+
+
+对dockerFile进行解析生成我们所需要的镜像:
+	docker build
+		-t <机构名>/<镜像名字>:<tags镜像版本>
+		<dockerFile所在的目录>
+		
+dockerFile内置命令
+
+//设置基准镜像，FROM scratch不依赖任何基准镜像从零构建
+FROM <基准镜像>
+
+//描述镜像的维护人或机构
+MAINTAINER <镜像作者信息>
+//生成描述性标签信息
+LABEl <标签名>=<描述信息>
+
+
+//切换工作目录,相当于cd命令;如果当前目录不存在，WORKDIR也会自动创建目录;workdir支持绝对路径也支持相对路径，推荐使用绝对路径方便后续查看维护
+WORKDIR <目录>
+
+//将制定文件或目录复制到镜像的指定目录下;ADD和COPY的作用类似;ADD具有自动解压缩文件的功能;ADD具有允许抓取远程文件的命令，这个功能使用场景较少
+ADD <主机路径，默认处在dockerFile同级文件夹> <虚拟机路径，默认处在当前工作目录中>
+COPY <主机路径，默认处在dockerFile同级文件夹> <虚拟机路径，默认处在当前工作目录中>
+
+//设置环境常量，例：ENV JAVA_HOME /usr/local/openjdk8;指定的环境常量后，任何地方都可以通过${}指定使用常量，例：RUN ${JAVA_HOME}/bin/java -jar test.jar
+ENV <环境名> <路径>
+
+//docker运行指令
+
+//在build构建时执行命令--创建镜像时执行,使用shell语法会在父进程中创建子进程shell,脚本执行完毕后子进程会被销毁;exec语法会创建一个进程替换原有的进程;根本区别就是是否创建子进程;推荐使用exec语法命令
+RUN
+	//shell语法格式
+	yum install -y  vim
+	//Exec命令格式
+	["yum","install","-y","vim"]
+
+//容器启动时执行的命令--创建容器时执行的命令;如果书写多行ENTRYPOINT只有最后一行的一定会被执行
+ENTRYPOINT
+
+//容器启动后执行的默认的命令后参数，如果容器存在多个CMD命令只有最后一个才会被执行，如果容器启动时附加了命令CMD命令就会被忽略，CMD相当于默认命令可以被忽略docker run <镜像> <启动时执行的命令>
+CMD

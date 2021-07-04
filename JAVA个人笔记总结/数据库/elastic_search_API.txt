@@ -1,0 +1,15 @@
+创建连接
+Settings.Builder settings = Settings.settingsBuilder();
+        settings.put("cluster.name", "elasticsearch");
+        TransportClient client = TransportClient.builder()
+                .addPlugin(ShieldPlugin.class)
+                .settings(settings.build()).build();
+        client.addTransportAddress(new InetSocketTransportAddress(
+                InetAddress.getByName("localhost"),
+                9300
+        ));
+
+
+新增
+client.prepareIndex("index", "type", "1").setSource(new HashMap<>()).get();
+
