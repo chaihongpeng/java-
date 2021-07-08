@@ -1,0 +1,98 @@
+JAVA API
+
+Transport Client;
+	ES老版本的api,es7已经不再推荐使用,8.0会被彻底删除,type也会被删除
+	
+//设置客户端配置
+Settings settings = Settings.builder().put("cluster.name", "elasticsearch").build();
+
+
+JAVA REST Client;
+	ES1.7以后推出的新的API
+	JAVA Low Level REST Client:兼容所有的版本
+	JAVA High Level REST Client:兼容高版本
+
+
+
+
+
+
+
+
+
+
+创建连接
+Settings.Builder settings = Settings.settingsBuilder();
+        settings.put("cluster.name", "elasticsearch");
+        TransportClient client = TransportClient.builder()
+                .addPlugin(ShieldPlugin.class)
+                .settings(settings.build()).build();
+        client.addTransportAddress(new InetSocketTransportAddress(
+                InetAddress.getByName("localhost"),
+                9300
+        ));
+
+
+新增
+client.prepareIndex("index", "type", "1").setSource(new HashMap<>()).get();
+
+
+
+
+
+
+
+
+引入pom
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+</dependency>
+
+写yml
+elasticsearch:
+  host: 127.0.0.1
+  port: 9200
+
+
+
+写配置类
+@Configuration
+@ConfigurationProperties(prefix = "elasticsearch")
+@Data
+public class ElasticSearchConfig extends AbstractElasticsearchConfiguration {
+    private String host;
+    private Integer port;
+    @Override
+    public RestHighLevelClient elasticsearchClient() {
+        RestClientBuilder builder = RestClient.builder(new HttpHost(host, port));
+        RestHighLevelClient restHighLevelClient = new RestHighLevelClient(builder);
+        return restHighLevelClient;
+    }
+}
+
+写DAO
+@Repository
+public interface Dao extends ElasticsearchRepository<User,String> {
+
+}
+
+
+实体类映射
+@Data
+@ToString
+//索引名称 主分片 副本
+@Document(indexName = "product", shards = 3,replicas = 1)
+public class User {
+    @Id
+    String id;
+    //文本类型
+    @Field(type = FieldType.Text)
+    String name;
+    @Field(type = FieldType.Keyword)
+    String age;
+    String description;
+}
+
+
+

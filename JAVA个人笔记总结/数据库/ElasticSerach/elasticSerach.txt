@@ -22,56 +22,7 @@ delete /[索引]/[_doc]/[主键]
 条件查询
 get /[index]/[_search]?q=[主键]:[内容]
 
-引入pom
-<dependency>
-	<groupId>org.springframework.boot</groupId>
-	<artifactId>spring-boot-starter-data-elasticsearch</artifactId>
-</dependency>
 
-写yml
-elasticsearch:
-  host: 127.0.0.1
-  port: 9200
-
-
-
-写配置类
-@Configuration
-@ConfigurationProperties(prefix = "elasticsearch")
-@Data
-public class ElasticSearchConfig extends AbstractElasticsearchConfiguration {
-    private String host;
-    private Integer port;
-    @Override
-    public RestHighLevelClient elasticsearchClient() {
-        RestClientBuilder builder = RestClient.builder(new HttpHost(host, port));
-        RestHighLevelClient restHighLevelClient = new RestHighLevelClient(builder);
-        return restHighLevelClient;
-    }
-}
-
-写DAO
-@Repository
-public interface Dao extends ElasticsearchRepository<User,String> {
-
-}
-
-
-实体类映射
-@Data
-@ToString
-//索引名称 主分片 副本
-@Document(indexName = "product", shards = 3,replicas = 1)
-public class User {
-    @Id
-    String id;
-    //文本类型
-    @Field(type = FieldType.Text)
-    String name;
-    @Field(type = FieldType.Keyword)
-    String age;
-    String description;
-}
 
 
 
@@ -143,10 +94,12 @@ POST /<索引>/<type>/<id>/_update
 DELETE /<索引名称>/<表type>/<id>
 
 ==================================================================================================================
+
+
 查询数据
 查询所有
 query_string 语法
-GET /<索引名称>/<type可以不加，不加就是在index下搜索>/_search?sort=<排序字段>:<asc/desc>&q=<字段名>:<查询词>&from=<分页起始位置>&size=<查询条数>
+GET /<索引名称>/<type可以不加，不加就是在index下搜索>/_search?sort=<排序字段>:<asc/desc>&q=<字段名>:<查询词>&from=<分页起始位置>&size=<查询条数>&timeout=<1s查询超时时间>
 
 ------------------------------------------------------------------------------------------------------------------
 query_DSL语法
@@ -367,6 +320,60 @@ doc中包含了哪些term
 
 
 
+
+
+查询的返回值
+{
+    "took": 328,
+    "timed_out": false,//是否超时,TimeOut机制，如果用户设置了超时时间,并且在规定时间内没有查询完毕，只返回已经查询到的数据
+    "_shards": {
+        "total": 1,
+        "successful": 1,
+        "skipped": 0,
+        "failed": 0
+    },
+    "hits": {
+        "total": {
+            "value": 2,
+            "relation": "eq"
+        },
+        "max_score": 1.0,
+        "hits": [
+            {
+                "_index": "user",
+                "_type": "_doc",
+                "_id": "1",
+                "_score": 1.0,
+                "_source": {
+                    "name": "xiaoming phone",
+                    "desc": "shouji zhong de zhandouji",
+                    "price": 38711,
+                    "tags": [
+                        "xingjibi",
+                        "fashao",
+                        "buka"
+                    ]
+                }
+            },
+            {
+                "_index": "user",
+                "_type": "_doc",
+                "_id": "2",
+                "_score": 1.0,
+                "_source": {
+                    "name": "pingguo shouji",
+                    "desc": "wo de shouji xiaoming",
+                    "price": 3940,
+                    "tags": [
+                        "hutu",
+                        "lulu",
+                        "buka"
+                    ]
+                }
+            }
+        ]
+    }
+}
 
 
 
