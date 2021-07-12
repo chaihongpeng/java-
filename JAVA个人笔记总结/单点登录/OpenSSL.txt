@@ -73,6 +73,81 @@ des des3  AES   加密过程中需要盐
 
 
 
+CA机构插入加密
+
+
+服务器拿着Server公钥去CA用CA私钥加密，生成证书
+黑客拿到证书后，解密证书拿到Server公钥
+黑客更改公钥，用自己的私钥加密出证书
+
+客户端自带公钥，CA的公钥是公开的，CA将公钥内置到操作系统里，CA的公钥是提前内置的，CA的证书里面有域名，域名不对无法访问，申请CA有很复杂的过程，不会出现黑客去其他CA机构生成同域名伪造证书
+
+CA机构提供一个公钥，服务器给CA的公钥生成证书，CA将证书给代理，代理给客户端
+到443端口去建立握手
+client --> server hi
+server --> client hi
+客户端向服务端协商加密算法
+服务器下发对称加密的秘钥
+
+
+
+证书由CA的私钥生成的，他需要公钥去解密
+crt pem都是公钥
+key私钥
+csr请求证书的证书
+
+
+公钥加密，私钥 签名数据 生成证书
+证书就是公钥
+
+
+自建CA
+注:<>内代表可选路径，<>内同名路径请保持全文一致
+
+生成CA私钥
+openssl genrsa -out <myca.key>
+
+生成CA公钥，也就是签名
+openssl req -new -key <myca.key> -out <myca.csr>
+
+certmgr.msc查看根证书
+
+生成CA根证书
+openssl x509 -req -in <myca.csr> -extensions v3_ca -signkey <myca.key> -out <myca.crt>
+
+对服务器端证书签名
+openssl x509 -days 365 -req -in <server.csr> -extensions v3_req -CAkey <myca.key> -CA <myca.crt> -CAcreateserial -out server.crt
+
+
+key私钥 crt公钥
+
+//生产CA私钥
+openssl genrsa -passout pass:111111 -des3 -out ca.key 4096
+//生成CA公钥
+openssl req -passin pass:111111 -new -x509 -days 365 -key ca.key -out ca.crt -subj "/CN=localhost"
+//生成服务器私钥
+openssl genrsa -passout pass:111111 -des3 -out server.key 4096
+//生成服务器请求证书的证书
+openssl req -passin pass:111111 -new -key server.key -out server.csr -subj "/CN=localhost"
+//生成公钥
+openssl x509 -req -passin pass:111111 -days 365 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt
+
+openssl rsa -passin pass:111111 -in server.key -out server.key
+openssl genrsa -passout pass:111111 -des3 -out client.key 4096
+openssl req -passin pass:111111 -new -key client.key -out client.csr -subj "/CN=localhost"
+openssl x509 -passin pass:111111 -req -days 365 -in client.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out client.crt
+openssl rsa -passin pass:111111 -in client.key -out client.key
+openssl pkcs8 -topk8 -nocrypt -in client.key -out client.pem
+openssl pkcs8 -topk8 -nocrypt -in server.key -out server.pem
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,0 +1,61 @@
+单机多容器的部署工具
+
+安装docker-compose
+	官网:https://docs.docker.com/compose/install/
+		获取docker-compose同时完成自动安装过程
+		sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+		文件夹的授权
+		sudo chmod +x /usr/local/bin/docker-compose
+		
+快速使用
+	创建docker-compose.yml的配置文件，名字是固定的不可以更改
+	
+	执行yml脚本
+		docker-compse 
+			up 解析自动部署 
+			-d 后台执行
+			logs 对应查看日志
+				<服务的名字> 查看一个docker-compose中指定容器的日志信息
+			down 停止已经部署的容器，并且移除
+			
+	
+
+编写dockerFile生成镜像
+	FROM open-jdk:8u222-jre
+	WORKDIR <项目在docker中的地址>
+	ADD <本地项目代码> <虚拟机目录>
+	EXPOSE <暴露端口>
+	CMD ["java", "-jar", "<项目jar包>"]
+	
+构建镜像
+	docker build -t <镜像名> <主机dockerFile路径>
+
+创建容器
+	docker run <镜像名字>
+	
+	
+mysql5.7容器内部初始化数据库的脚本目录，所有初始化内容都要放到这个目录才可以，官方定义的:docker-entrypoint-initdb.d
+
+
+docker-compose格式
+
+version: "3.3"//docker-compose的解析版本
+services://用于描述所有要部署的容器以及相关的信息
+  <服务名>://服务名，既是容器名，又是网络通讯的主机名
+    build: <主机目录>//指定需要解析的dockerFile，并且创建它的容器
+	restart:  <always>//容器宕机后会重新启动一个新的容器进行替换
+    enviroment://配置环境变量,容器启动时附加的环境变量，例：
+	  MYSQL_ROOT_PASSWORD: 1234
+	depends_on:
+	  - <依赖的容器服务名>//设置依赖关系后，两个容器就可以通过服务名直接通讯了，类似于网桥机制
+	ports:
+	  - "<宿主机端口>:<容器内部端口>"//配置端口映射
+
+
+
+
+
+
+
+
+
