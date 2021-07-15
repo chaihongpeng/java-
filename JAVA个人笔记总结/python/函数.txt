@@ -1,0 +1,15 @@
+矩阵
+
+numpy.array([1,2,3])
+numpy.dtype打印出类型
+numpy的所有数据类型必须相同，修改会自动转型
+
+将其他类型转换为int类型
+int()
+将其他类型转换为string类型
+str()
+将其他类型转化为float类型
+float()
+
+键盘输入函数，返回值输入的函数
+input()

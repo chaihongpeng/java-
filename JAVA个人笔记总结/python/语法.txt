@@ -54,8 +54,43 @@ def <函数名>(<可选参数>):
 	return <返回值>
 
 
+class <类名，开头大写规范>
+	类内变量叫类属性
+	方法内最好写self参数，类内def叫函数，类外叫做函数，@staticmethod注解修饰的叫做静态方法,静态方法没有self
+	@classmethod修饰的叫做类方法，方法内传cls
+	__init__(self,<其他参数>):初始化方法
 
 
+创建对象
+	<参数名> = <类名>()
+	
+	
+	
+python基础类型也是对象，有id,type,value;但是基础类型有池，同值基础类型不会重复创建
+
+
+
+一个python文件就是一个模块
+模块：
+	函数：
+	语句：
+	类：
+		内容
+		
+包，一个python程序有n多个包，包中包含n多个模块
+
+import package.moudle as m1
+m1.<调用模块中的方法属性类>
+	
+
+from package import <包，模块，函数，变量>
+
+
+
+python的内置模块
+
+
+第三方模块安装和使用
 
 
 
