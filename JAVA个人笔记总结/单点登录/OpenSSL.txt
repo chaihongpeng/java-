@@ -141,6 +141,10 @@ openssl pkcs8 -topk8 -nocrypt -in client.key -out client.pem
 openssl pkcs8 -topk8 -nocrypt -in server.key -out server.pem
 
 
+req:主要用于生成和处理PKCS#10证书请求
+	-out:指定输出文件名。
+
+
 
 
 
