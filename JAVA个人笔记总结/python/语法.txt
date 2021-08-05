@@ -54,7 +54,7 @@ def <函数名>(<可选参数>):
 	return <返回值>
 
 
-class <类名，开头大写规范>
+class <类名，开头大写规范>:
 	类内变量叫类属性
 	方法内最好写self参数，类内def叫函数，类外叫做函数，@staticmethod注解修饰的叫做静态方法,静态方法没有self
 	@classmethod修饰的叫做类方法，方法内传cls

@@ -1,0 +1,33 @@
+三层模型
+M:	model业务逻辑，分页统计，跳转service
+	DAO层，数据持久层
+V：	提供用户访问相关的，jsp,json：json虽然只是数据，单也算是被渲染了一次
+C：	controller请求分发
+
+
+设计数据库表，设计实体类，写service
+
+person表，有一行一行表数据，可以查询并执行业务逻辑，业务逻辑在service，查询在DAO层，查询和业务逻辑都在model层
+
+ValueObject vo层
+
+person对于数据层关系映射，只有kv数据没有方法啥也做不了，只描述了数据没有行为，称为贫血模型
+
+Domain领域,如果从领域来出发，person就不能单独只有键值关系，person还必须具有能吃，能喝，能跑的动作，就是把业务逻辑写到领域里，他不在是一个单独的vo模型
+
+以前是方法在service里，现在反过来，行为跑到了模型里，以前的service去处理逻辑方法，现在的service区组织这些领域模型
+	service调到了dao层，domain里面也有行为和方法，他也去调用dao层，
+	
+	
+	model涵盖了service,dao,domain
+	批量查询，批量删除修改都可以写在service层
+	这会domain的数据和表不是一一对应的
+	
+	
+	
+
+
+用户填写表单，表单数据被展示为VO
+展示层把VO转化为对应方法所需的DTO,controller传给service一个dto
+service和service之间互相调用的时候，会转化为do对象
+持久化时会传一个po对象

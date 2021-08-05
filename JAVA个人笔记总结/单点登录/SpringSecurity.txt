@@ -1,0 +1,121 @@
+PasswordEncoder接口用于密码的转换
+选择一个校验时间在1s左右的算法在你的服务器
+5.1.2密码加密最佳使用
+
+
+跨站伪造请求
+	同步器令牌模式，http中必须存在一个安全的随机生成值,csrf令牌
+	服务器查找预期令牌和http请求中的令牌对比，不匹配则拒绝
+	这项工作的关键是令牌位于浏览器不会自动包含请求的一部分，例如http参数或http请求头，cookie不行因为cookie会被自动发送
+	不希望get请求中有令牌，因为这会导致令牌泄露
+	
+	在cookie中指定SameSite属性5.2.1，浏览器功能防止跨站发送cookie,当用户在第三方网站打开某个网站的跳转链接后Strict模式无法获取cookie,Lax可以在get请求中获取，post等请求不能获取身份验证
+	部分旧浏览器不支持SameSite请求
+	
+	http方法表单
+	
+SecurityContextHolder存储用户的详细校验信息
+	指示用户已经身份验证追简单的方法是通过SecurityContextHolder直接设置
+	SecurityContextHolder.createEmptyContext();//创建一个空的用户上下文
+	Authentication authentication = new TestingAuthenticationToken("username", "password", "ROLE_USER"); //创建一个Authentication对象，最常用的UsernamePasswordAuthenticationToken
+	SecurityContextHolder.setContext(authentication);//将授权信息设置到holder应用上下文持有者当中，spring security将使用这个信息进行授权
+	
+	如果你想获取授权主体信息，也可以通过访问holder获取
+	SecurityContext context = SecurityContextHolder.getContext();
+	Authentication authentication = context.getAuthentication();
+	String username = authentication.getName();
+	Object principal = authentication.getPrincipal();
+	Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+	
+	AuthenticationManager认证管理器，是定义spring security过滤器如何执行身份验证的api,如果你不适用spring security的身份认证则可以通过直接将在holder中设置不需要使用AuthenticationManager
+	常用的AuthenticationManager认证管理器接口实现有ProviderManager，它是一组AuthenticationProvider的集合，每一个AuthenticationProvider都有机会表名身份验证应该成功、失败
+	或者无法做出决定交给其他provider做出决定;如果没有匹配的provider可以通过身份验证，则身份验证将失败，并抛出ProviderNotFoundException异常
+	
+	实际上每一个AuthenticationProvider授权提供者都知道处理特定类型的身份验证;例如，一个provider可以处理密码登录，而另一个provider可以处理SAML验证
+	ProviderManager允许配置一个父级，AuthenticationProvider无法执行身份验证时会咨询父级
+	
+	
+	AuthenticationEntryPoint 用于回应从客服端发送请求凭证的http响应
+	如果是密码登录等请求则不需要提供响应，其他情况如客户端无权访问，则可以使用AuthenticationEntryPoint来发送相关响应
+	
+	
+	AbstractAuthenticationProcessingFilter抽象认证处理器过滤器
+	
+	*1当用户提供他们的凭证时(这里的凭证可能是用户名或密码也可能是别的类型的凭证)
+		AbstractAuthenticationProcessingFilter鉴权过滤器就会创建一个Authentication，这个Authentication取决于子类实现
+		如UsernamePasswordAuthenticationFilter创建的就是UsernamePasswordAuthenticationToken
+		
+		这个Authentication交给AuthenticationManger去认证
+		
+		如果认证失败，该holder会被清除
+		执行RememberMeServices.loginFail。如果有配置记住密码的操作
+		调用AuthenticationFailureHandler
+		
+		如果认证成功
+		SessionAuthenticationStrategy会话验证策略，收到通知
+		RememberMeServices.loginSuccess被调用，如果配置过
+		ApplicationEventPublisher发布一个InteractiveAuthenticationSuccessEvent
+		AuthenticationSuccessHandler 被调用，通常这里会重定向到ExceptionTranslationFilter缓存的上次登录失败的请求地址
+	
+	AuthenticationEntryPoint用于发送客户端http请求的响应
+	
+	
+	*2
+	该AccessDecisionManager的decide方法通过了所有它为了使授权决策所需要的相关信息。特别是，传递安全信息Object可以检查包含在实际安全对象调用中的那些参数。
+	例如，让我们假设安全对象是MethodInvocation. 查询MethodInvocation任何Customer参数很容易，然后在 中实现某种安全逻辑AccessDecisionManager以确保允许主体对该客户进行操作。
+	AccessDeniedException如果访问被拒绝，实现将抛出一个。
+	该supports(ConfigAttribute)方法由AbstractSecurityInterceptor启动时调用，以确定是否AccessDecisionManager可以处理传递的ConfigAttribute. 该supports(Class)方法由安全拦截器实现调用，以确保配置AccessDecisionManager支持安全拦截器将呈现的安全对象类型。
+
+
+过滤器链
+AbstractAuthenticationProcessingFilter提供认证请求的鉴权
+	--> impelement UsernamePasswordAuthenticationFilter 用户名和密码鉴权处理器*1
+
+ExceptionTranslationFilter 处理安全异常过滤器
+	拦截AccessDeniedException(拒绝访问异常)、AuthenticationException(认证异常)这两个异常翻译给响应体
+		首先执行过滤器
+		如果未通过认证或出现认证异常，则启动认证
+			holder被清除
+			保存HttpServletRequest到RequestCache,用于用户登录成功后的重放请求
+			AuthenticationEntryPoint用于生成响应体
+		
+		
+	
+请求认证过滤关系
+Servlet Filter:服务过滤器
+	DelegatingFilterProxy:委派过滤器代理
+		FilterChainProxy:过滤链代理,基于spring实现的过滤器
+			- SecurityFilterChain:安全过滤器链
+
+
+身份存储关系	
+SecurityContextHolder:安全上线文持有至
+	SecurityContext:安全上下文
+		Authentication:授权主体
+			- GrantedAuthority:权限
+			
+身份认证提供者关系
+AuthenticationManger:定义spring security如何执行身份认证
+	<--impelement ProviderManager:提供者管理器，管理身份认证提供者的集合
+		- AuthenticationProvider:身份认证提供者
+	
+AuthenticationEntryPoint  10.8为阅读
+
+
+AbstractSecurityInterceptor
+	-->impelement FilterSecurityInterceptor授权过滤器
+		- AccessDecisionManager负责解读aGrantedAuthority.getAuthority()获取的string,如果当前AccessDecisionManager无法解读，则返回null，交给其他人解读*2
+
+
+
+
+会话管理
+
+会话管理由这两个接口共同控制SessionManagementFilter、SessionAuthenticationStrategy
+过滤器委托给这两个接口
+
+
+
+15.8解决跨域问题
+CorsFilter跨域过滤器
+

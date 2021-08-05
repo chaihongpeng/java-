@@ -1,0 +1,20 @@
+例：
+	student = ["Tom", "Jim"]
+	scores = ["70","80"]
+学生名字和学生的得分
+
+字典写法：
+	字典就是key value 的map集合
+	scores = {}
+	scores["Tom"] = 70
+	scores["Jim"] = 80
+	
+	或者
+	
+	students = {
+		"Tom" : 70,
+		"Jim" :80
+	}
+	
+
+in判断元素是否在字典中

@@ -1,0 +1,12 @@
+数据的预处理
+csv格式:任何以逗号为分割符的表格都可以使用read_csv读取
+返回格式为DataFrame数据流
+csv = pands.read_csv(<文件位置>)
+
+csv.head(<数量n>)//查看前n行的数据
+csv.tail(<数量n)//查看后n行的数据
+csv.colums //数据的列名称属性
+csv.shap //读取行列数
+csv.loc(<索引n>)//获取第n行的数据
+
+csv.describe()//查看数据的描述信息

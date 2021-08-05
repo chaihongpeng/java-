@@ -1,0 +1,14 @@
+df = open(<文件路径>,<r读取操作>)
+
+content = df.read()
+
+df.close()//关闭文件
+
+df = open(<文件路径>,<w写入操作>)
+df.write()
+
+df.close()
+
+
+文字切分
+str.split()
