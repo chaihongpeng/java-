@@ -229,6 +229,11 @@ PUT /<index>
 				format:<日期格式数据的时间格式>,
 				fielddata:<true是支持聚合，性能低一般不使用，一般直接创建keyword并查询>
 			}
+			//复杂类型
+			<字段名称>:{
+				type:nested
+				properties:{}
+			}
 		},
 		dynamic:<是动态添加新字段,more难为true,设置为false可以被创建但是不会添加到索引中>
 	}
@@ -378,7 +383,12 @@ doc中包含了哪些term
 
 
 
-
+获取分词结构
+GET /forum/_analyze
+{
+	"field":"<field>",
+	"text":<value>
+}
 
 
 

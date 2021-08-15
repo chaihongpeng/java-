@@ -1,0 +1,159 @@
+es支持json格式，扩展性和灵活性都非常好
+
+es5.2版本以后,type=text默认设置两个field,一个是field本身，还有一个field.keyword,默认不分词会最多保留256个字符
+
+term就是对搜索文本不分词，直接拿去倒排索引匹配，你输入什么就匹配什么
+
+分词后默认原来的field就没有了，只有分词后的各个word存在于倒排索引中
+但是5.2以后可以通过field.keyword找到原来的字符,但是默认只保留256个字符
+所以要尽可能自己手动创建索引，指定not_analyzed，也可以不指定not_analyzed将type=keyword
+
+filter执行原理深度解析:
+    - 在倒排索引中寻找到document list
+    - 使用找到的doc list构建一个bitset[0,1,0,1,1,1],用来标注一个doc对一个filter是否匹配，如果匹配就是1，不匹配就是0
+    - 遍历每个bitset,优先从最疏的开始搜索，查找所有满足条件的document,因为每一个filter都会对应一个bitset
+    - 缓存bitset在caching,document被修改后缓存会自动更新
+    
+    
+ Nested:
+    以往查询对象数组类型:
+        订单索引order:{
+            order_name:"订单AA-01",
+            good_list:[
+                {
+                    name:"扫地机器人",
+                    price:1999
+                },
+                {
+                    name:"显卡R3x"
+                    price:2330
+                }
+            ]
+        }
+        GET order/_search
+        query:{
+            bool:{
+                 must:[
+                    {
+                        match:{
+                            good_list.name:"显卡R3x"
+                        },
+                    },
+                    {
+                        match:{
+                            good_list.price:1999
+                        }
+                    }
+                ]
+            }
+        }
+    查询Nested结构数据:
+        GET province/_search
+        query:{
+            nested:{
+                path:"province.cities"//指定nested字段对象的查询深度，如果是多层嵌套就是用.;例:province.cities就是查询省份下的城市，又符合条件的数据
+                query:{
+                    bool:{
+                        must:[
+                        {
+                            match:{
+                                province.cities:"北京市"
+                            }
+                        },
+                        {
+                            nested:{
+                                path:"province.cities.district",
+                                query:{
+                                    match:{
+                                        "province.cities.district.name":"淇滨区"
+                                    }
+                                }
+                            }
+                        }
+                        ]
+                    }
+                },
+                score_mode:"avg"//子查询的相关度评分
+            }
+        }
+    Join Query:
+        PUT msb_depart/
+        {
+            mappings:{
+                properties:{
+                    my_id:{
+                        type:"keyword"
+                    },
+                    msb_join_field:{
+                        type:"join",
+                        relations   :{
+                            depart:"employee"
+                        }
+                    }
+                }
+            }
+        }
+        
+        PUT msb_depart/_doc/1?refresh
+        {
+            my_id:1,
+            text:"咨询部"
+            //join字段就是指定当前文档放在哪一个层级下面
+            msb_join_field:{
+                name:depart
+            }
+        }
+        PUT msb_depart/_doc/2?routing=1&refresh
+        {
+            my_id:2,
+            text:"马老师",
+            msb_join_field:{
+                name:"employee",
+                parent:1
+            }
+        }
+        
+        //搜索所有的部门
+        GET msb_depart/_search
+        {
+            query:{
+                has_child:{
+                    type:"employee",
+                    query:{
+                        match_all:{}
+                    }
+                }
+            }
+        }
+        //搜索咨询部的所有老师
+        GET msb_depart/_search
+        {
+            query:{
+                has_parent:{
+                    parent_type:"depart",
+                    query:{
+                        match:{
+                            text:"咨询部"
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
