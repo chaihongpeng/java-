@@ -136,7 +136,39 @@ IP
 		
 	
 	操作系统接到请求会放入pending Queue中
-	直到线程触发accept系统调用拿出数据，内核行程socket文件句柄拿到线程中，派发线程在把socket配发给工作线程
+	直到某一个派发线程触发accept()系统调用
+	在内核空间形成一个socket文件
+	socket文件形成一个资源句柄fd
+	最后派发线程发送给工作线程，由工作线程去处理fd
+	最后工作线程就可以直接把返回值写入到fd
+	
+	
+	为什么区分派发线程和工作线程，因为accept方法本身消耗时间，如果用accpet去处理数据，请求就会更长时间的去排队，所以转么分出派发线程区快速处理pending queue中的内容
+	
+	ServerSocket.accept获取一个socket
+	socket可以获取输入和输出流，处理完后关闭
+	
+	
+	DateInputStream可以读取Char、Float等类型
+	
+	
+	NIO的核心概念
+	nio将数据存储到buffer当中，形成cannel，在数据完全创建后生成工作线程才会从cannel中读取数据，这样就减少了工作线程的阻塞时间
+	ssc = ServerSocketChannel.open()
+	ssc.bind(new InetSocketAddress(port))
+	ssc.configureBlocking(false)
+	
+	for(;;)性能高于while(true),可以省略一次判断
+	
+	
+	HTTP协议
+	HTTP/1.1 200 OK   ---200状态码,OK状态描述
+	
+	URL https://www.baidu.com:80/books?id=100#Good  ---https scheme描述协议; www.baidu.com host主机;8080 port端口;books path资源目录;id=100 query查询条件 #Good fragment二级分类，通常给前端用的
+	
+	DNS域名解析系统，因为互联网传输数据IP协议要求必须知道ip地址,浏览器询问DNS来寻找www.baidu.com的ip地址
+	
+	
 	
 	
 	

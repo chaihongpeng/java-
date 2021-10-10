@@ -45,3 +45,47 @@ springsecurity能配置哪些
 authorizeRqquest标签下可以配置登录要求
 
 自定义登录页面
+
+
+
+
+acl_sid: {
+	id
+	principal,//是用户 OR 角色
+	sid//绑定用户的id OR 角色的id
+}
+acl_object_identity: {//授权控制表,与被授权主体一对一,与授权信息一对多
+	id,
+	object_id_class: {//关联对象的类信息
+		acl_class: {
+			id,//long
+			class,//string
+		}
+	},
+	object_id_identity,//关联对象的主键
+	parent_object,//long
+	owner_sid,//long
+	entries_inheriting,//boolean
+}
+//具体的权限信息
+acl_entry: {
+	id,
+	acl_object_identity,//long
+	ace_order,//所属的权限顺序
+	sid,//被授权的对象主体
+	mask,//权限掩码
+	granting,//是否授权
+}
+
+
+
+
+
+
+
+
+
+一acl----多ObjectIdentity
+
+一acl----一AccessControlEntity，控制项,一个
+一acl----一个Sid
