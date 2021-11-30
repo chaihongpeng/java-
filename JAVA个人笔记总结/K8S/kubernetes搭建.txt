@@ -1,0 +1,89 @@
+//关闭交换区
+swapoff -a
+
+//注释掉配置文件中swap的内容
+vi /etc/fstab
+
+//规定k8s在容器间通讯时也要遵循iptaables响应的处理，用于提高网络的安全性
+cat <<EOF> /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+sysctl --system
+
+
+集群搭建
+
+构建主服务器
+//初始化kubeadmin
+//安装k8s具体版本1.14.1
+//虚拟ip地址的边界
+kubeadmin init --kubernetes-version=v1.14.1 --pod-network-cidr=10.244.0.0/16
+
+
+//查看工具
+
+//获取k8s的所有节点
+kubectl get nodes
+//显示所有的命名空间
+kubectl get pod --all-namespaces
+//查看主节点生成的令牌列表命令
+kubeadmin token list执行查看
+
+//安装flannel网络组件
+//flannel是pod彼此间能够通讯的默认传输格式
+kubectl create -f kube-flannel.yml
+
+
+
+
+
+2.服务器重启后k8s的快速恢复
+kubeadmin是kubenetes集群快速构建工具，简化集群构建工作
+kubelet运行在所有的节点，负责启动POD和容器，以系统服务的形式出现
+kubectl:k8s的命令工具，负责提供指令
+
+//启动k8s命令
+systemctl start kubelet
+//k8s跟随主机启动而启动
+systemctl enabel kubelet
+
+
+
+
+3.WEB UI Dashboard
+//k8s的图形化监控界面
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

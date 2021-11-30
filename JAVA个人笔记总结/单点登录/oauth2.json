@@ -1,0 +1,10 @@
+{
+  "oauth2": {
+    "oauth2的组成": {
+      "appid": "自身凭证",
+      "redirect_uri": "授权完成后返回的网址",
+      "scope": "授权的范围",
+      "state": "预防csrf攻击"
+    }
+  }
+}

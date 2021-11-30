@@ -124,6 +124,52 @@ DelegatingFilterProxy函数入口
 	UserDetailsService
 	
 	AuthenticationEntryPoint未授权统一处理类
+	
+	
+	
+	
+	
+	
+	
+
+
+
+
+
+
+
+
+
+hasRole("admin");hasAnyRole();
+
+
+
+CSRF
+XSS跨站点脚本攻击
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
