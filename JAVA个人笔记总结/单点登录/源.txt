@@ -1,0 +1,54 @@
+
+ObjectPostProcessorConfiguration
+	.objectPostProcessor() {
+		return new AutowireBeanFactoryObjectPostProcessor(beanFactory);
+	}
+
+WebSecurityConfiguration
+	//获取所有的过滤器
+	@Autowired
+	setFilterChains(List<SecurityFilterChain> securityFilterChains) {
+		this.securityFilterChains = securityFilterChains;
+	}
+
+	//创建springSecurityFilterChain过滤器
+	@Bean
+	Filter springSecurityFilterChain(){
+		return this.webSecurity.build();
+	}
+
+WebSecurityConfiguration
+	.doBuilder()
+
+AbstractSecurityBuilder
+	.configure()
+	.getConfigurers() //从configurers中获取
+	.build()
+
+WebSecurity
+	.performBuild() {
+		//创建过滤器
+		new FilterChainProxy(securityFilterChains) 
+	}
+
+SecurityFilterAutoConfiguration注册bean DelegatingFilterProxyRegistrationBean
+
+DelegatingFilterProxyRegistrationBean
+	new DelegatingFilterProxy
+
+DelegatingFilterProxy(String targetBeanName, @Nullable WebApplicationContext wac)
+
+FilterChainProxy
+
+
+{
+	FilterChain:[
+		DelegatingFilterProxy:[
+			FilterChainProxy:{
+				SecurityFilterChain:[
+					SecurityFilter:{}
+				]
+			}
+		]
+	]
+}

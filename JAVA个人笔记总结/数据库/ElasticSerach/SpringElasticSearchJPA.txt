@@ -1,0 +1,24 @@
+Repository接口
+	//支持派生方法
+	CrudRepository:{
+		save(T entity)
+		findById(id)
+		findAll
+		count
+		delete(T entity)
+		existsById(id)
+	}
+		//Sort.unsorted();Pageable.unpaged();
+		//Sort sort = Sort.by("firstname").ascending().and(Sort.by("lastname").descending());
+		PagingAndSortingRepository:{
+			findAll(Sort sort)
+			findAll(Pageable pageable)--PageRequest.of(page,size)
+		}
+		
+		
+4.4.5 Top、First限制查询
+4.4.6 返回集合类型
+
+
+4.6.1自定义单个存储库
+	定义接口-->实现接口----与片段接口对应的类名中最重要的部分是Impl后缀。

@@ -1,0 +1,9 @@
+SecurityContextPersistenceFilter:{
+	每次请求访问时,负责从session中取出数据到SecurityContextHolder当中
+	将SpringSecurityContextHolder的存储回存储库,并清空上下文
+}
+
+
+AbstractPreAuthenticatedProcessingFilter:{
+
+}

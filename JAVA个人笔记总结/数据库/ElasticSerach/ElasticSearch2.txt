@@ -144,7 +144,11 @@ filter执行原理深度解析:
 
 
 
-
+更新API
+POST /<index>/_update/<id>
+{
+	
+}
 
 
 

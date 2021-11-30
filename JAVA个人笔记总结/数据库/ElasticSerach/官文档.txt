@@ -1,0 +1,111 @@
+倒排索引列出文档中独特的单词
+索引是文档们的优化集合
+每一个文档都是一系列字段集合
+
+
+text字段存储在倒排索引中
+数字和地理位置存储在BKD树中
+es数据库具有自动定义数据类型的能力，但是es更希望你能自己定义映射和索引方式
+	自己定义区分全文字符串和精确匹配字符串
+	定义具体的分词器
+	优化匹配字段
+	使用自定义日期格式
+	
+es api支持结构化查询，全文检索，和两种结合的复杂查询
+
+结构化查询类似于sql查询
+	举例：你想查询员工的年龄和性别，并且匹配雇佣日期
+	全文检索会查询所有的文档匹配你的字符串，并且进行关联排序
+	
+	
+映射是定义文档及其文档如何存储和索引的过程
+每个文档都是字段集合
+每个字段都有自己的数据类型
+
+动态映射：索引文档时es自动添加字段
+显示映射：允许你精确定义映射
+
+
+防止索引爆炸
+定义太多的字段在一个索引上可能会导致内存不足，使用映射限制设置防止索引爆炸
+
+
+
+
+
+添加单条数据
+POST index/type
+{}
+
+PUT index/_bulk
+
+部分数据查询
+GET index/_search
+{
+	query:{},
+	fields:[],
+	_source:false
+	sour:[{}]
+}
+
+Extract fields from unstructured content运行时字段script
+
+bool组合查询
+
+aggre聚合查询
+
+	桶聚合
+GET _search
+{
+	aggs:{
+		"new-field":{
+			terms:{field:""}
+		}
+	}
+}
+
+
+_search
+{
+	timeout:超时时间
+	query:{}
+}
+
+
+叶子查询子句match,term,range
+符合查询子句bool,dis_max
+昂贵查询script需要线性查询
+
+//添加新字段在索引中
+PUT /index/_mapping
+{
+	properties:{
+		field:{
+			type:long
+		}
+	}
+}
+
+
+
+fuzzy query 模糊查询
+
+GET / _search { "query" : { "fuzzy" : { "user.id" : { "value" : "ki" } } } }
+GET / _search { "query" : { "fuzzy" : { "user.id" : { "value" : "ki" , "fuzziness" : "AUTO" , "max_expansions" : 50 , "prefix_length" : 0 , "换位” ：true ，“重写” ：“constant_score” } } } }
+
+
+
+
+创建聚合索引字段
+PUT stats-index
+{
+  "mappings": {
+    "properties": {
+      "agg_metric": {
+        "type": "aggregate_metric_double",
+        "metrics": [ "min", "max", "sum", "value_count" ],
+        "default_metric": "max"
+      }
+    }
+  }
+}

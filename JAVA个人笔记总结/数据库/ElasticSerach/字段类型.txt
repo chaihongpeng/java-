@@ -1,0 +1,42 @@
+常见类型
+	binary编码为base64字符串二进制
+	boolean
+	keywords
+		keywords
+		constant_keyword
+		wildcard
+	numbers
+		long
+		double
+	dates
+		date
+		date_nanos
+	alias现有字段的别名
+
+对象和关系类型
+	object一个json对象
+	flattened整个json对象作为某个字段值
+	nested一个json对象，保留其子字段之间的关系
+	join为同一个索引中的文档定义父子关系
+结构化数据类型
+	range
+		long_range, double_range, date_range, ip_range.
+聚合数据类型
+文本搜索类型
+	text
+	annotated-text
+	completion
+	search_as_you_type
+	token_count
+文档排序类型
+
+数组：es中没有专门的数组类型，默认任何字段都可以包含零个或者多个
+
+
+关键字类型
+	关键字字段通常用于排序、 聚合和术语级别的查询，例如term。属于级查询https://www.elastic.co/guide/en/elasticsearch/reference/current/term-level-queries.html
+	
+
+文本类型
+	用于索引全文的字段analyzed,在被索引之前通过分析器将字符串转化为单个术语的列表
+	text适合人类可读的非结构化内容

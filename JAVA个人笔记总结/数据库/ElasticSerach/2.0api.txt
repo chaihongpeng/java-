@@ -1,0 +1,74 @@
+新增
+	client.prepareIndex(index, type, id)
+		.setSource(
+			jsonBuilder()
+				.startObject()
+					.field(key, value)
+				.endObject()
+		).get();
+		
+
+查询
+	client.prepareGet(index, type, id).get()
+	
+删除
+	client.prepareDelete(index, type, id).get()
+	
+更新
+
+	newUpdateRequest(index, type, id)
+
+	UpdateRequest updateRequest = new UpdateRequest();
+	updateRequest.index(index);
+	updateRequest.type(type);
+	updateRequest.id(id);
+	updateRequest.doc(jsonBuilder()
+			.startObject()
+				.field(key, value)
+			.endObject());
+	client.update(updateRequest).get();
+	
+	
+	client.prepareUpdate(index, type, id)
+		.setDoc(
+			jsonBuilder()
+				.startObject()
+					.field(key, value)
+				.endObject()
+		).get();
+	
+批量获取
+	BulkRequestBuilder bulkRequest = client.prepareBulk();
+
+	bulkRequest.add(client.prepareIndex("twitter", "tweet", "1")
+			.setSource(jsonBuilder()
+						.startObject()
+							.field("user", "kimchy")
+							.field("postDate", new Date())
+							.field("message", "trying out Elasticsearch")
+						.endObject()
+					  )
+			);
+
+	bulkRequest.add(client.prepareIndex("twitter", "tweet", "2")
+			.setSource(jsonBuilder()
+						.startObject()
+							.field("user", "kimchy")
+							.field("postDate", new Date())
+							.field("message", "another post")
+						.endObject()
+					  )
+			);
+
+	BulkResponse bulkResponse = bulkRequest.get();
+
+
+Search API
+	SearchResponse response = client.prepareSearch("index1", "index2")
+        .setTypes("type1", "type2")
+        .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+        .setQuery(QueryBuilders.termQuery("multi", "test"))                 // Query
+        .setPostFilter(QueryBuilders.rangeQuery("age").from(12).to(18))     // Filter
+        .setFrom(0).setSize(60).setExplain(true)
+        .execute()
+        .actionGet();

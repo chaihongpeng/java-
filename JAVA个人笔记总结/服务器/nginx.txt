@@ -43,7 +43,7 @@
 			location /www/{
 				alias /data/; //通过访问/www/就可以访问到/data/路径下的文件
 				index index.html index.html;
-			}
+			},
 			location /image/{
 				root /data/; //通过访问/image/就可以访问到/data/image/路径下的文件
 				autoindex on;//可以列出目录

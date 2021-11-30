@@ -1,0 +1,165 @@
+所有的token 来自于Token Endpoint
+返回给client一个Authorization Code
+client用Authorization Code交换为token
+
+client准备一个授权请求
+client发送授权请求到Authorization Server
+Authorization Server授权End-user
+Authorization Server获取End-User Consent/Authorization
+Authorization Server返回Authorization Code
+client使用Authorization Code请求在Token Endpoint
+client接收到包含token和refresh token的响应
+client校验id token
+
+Authorization Endpoint
+在传统的 客户端--服务端 授权模型中，客户端请求一个 使用权受限资源（受保护资源）在服务器端
+必须要通过 服务器端 使用 资源持有者的凭证 来获取资源
+
+为了给第三方提供受限资源的访问权限，资源持有者要分享自己的凭证给第三方，这回产生以下几种局限和问题
+
+   o 第三方应用程序需要存储资源
+      所有者的凭据以备将来使用，通常是
+      明文密码。
+
+   o 服务器需要支持密码认证，尽管
+      密码存在固有的安全弱点。
+
+   o 第三方应用程序获得了对资源
+      所有者受保护资源的过于广泛的访问权限，使资源所有者没有任何权限
+      限制持续时间或访问有限
+      资源子集的能力。
+
+   o 资源所有者不能在不撤销
+      对所有第三方的访问权限的情况下撤销对单个第三方的访问权限，并且必须通过
+      更改第三方的密码来实现。
+
+   o 任何第三方应用程序的泄露都会
+      导致最终用户密码和受该
+      密码保护的所有数据泄露。
+	  
+ouath通过引入授权层来解决这些问题
+并且
+
+
+
+acl_sid: sid分为两种，一种是基于用户的，一种是基于权限的;sid就是用户或权限，授权的授予对象就是sid
+	id
+	sid
+	principal
+
+acl_class:用来保存对象类型
+	id,
+	class
+
+acl_object_identity:保存被访问对象的信息，对象类型对象的主键，对象的父对象，是否继承父对象
+	id
+	object_id_class:关联acl_class
+	object_id_identity:对象的主键
+·	parent_object:父对象
+	owner_sid:拥有者的sid关联acl_sid
+	entries_inheriting是否继承父对象的权限
+
+acl_entry:
+	id
+	acl_object_identity acl的主键
+	ace_order
+	sid被授权对象的id
+	mask
+	granting是否授权
+	audit_success
+	audit_failure
+
+
+在开始使用spring acl之前，你需要在某处存储你的acl信息
+这需要使用spring的数据源去实例化
+
+一个ObjectIdentity单个域对象的识别,type id;要实现equals方法,让两个ObjectIdentity通过id和type去比较
+domain对象转化为ObjectIdentity
+
+AccessControlEntity访问控制项
+
+Acl拥有一个ObjectIdentity，拥有一组AccessControlEntity，拥有一个Sid表示Acl的拥有者,owner对这个acl拥有完全的控制权
+
+Sid对用户或权限的抽象
+
+ACE表示一个sid的权限
+
+Permission权限
+
+
+
+
+acl_object_identity==Acl资源对象
+	一对多acl_entry表示资源所开放的授权
+	多对一acl_class,表示资源的type
+	一对一parent_object父对象
+	多对一owner_sid词条资源控制的所有者
+acl_entry==AccessControlEntry对象对应授出的权限
+	sid被授权的对象
+	mask权限码
+	sid被授权对象的id
+acl_sid==Sid被授权的目标
+	用户绑定或者角色绑定
+
+
+需要一个sid表关联角色
+需要一个acl_object_identity关联record
+需要多个acl_entry绑定角色和资源
+
+
+一份资源绑定一个ACL,
+	一个ACL绑定多个ACE
+		一个ACE绑定一个Permission
+		一个ACE绑定多个Sid
+
+
+select obj.object_id_identity as obj_id,class.class as class from acl_object_identity obj, acl_object_identity parent, acl_class class where obj.parent_object = parent.id and obj.object_id_class = class.id and parent.object_id_identity = ? and parent.object_id_class = (select id FROM acl_class where acl_class.class = ?)
+
+
+
+
+
+
+select acl_object_identity.object_id_identity, 
+			acl_entry.ace_order,  acl_object_identity.id as acl_id, acl_object_identity.parent_object, 
+			acl_object_identity.entries_inheriting, acl_entry.id as ace_id, acl_entry.mask,  
+			acl_entry.granting,  acl_entry.audit_success, acl_entry.audit_failure, 
+			acl_sid.principal as ace_principal,acl_sid.sid as ace_sid,  
+			acli_sid.principal as acl_principal, acli_sid.sid as acl_sid, acl_class.class 
+
+from acl_object_identity 
+			left join acl_sid acli_sid on acli_sid.id = acl_object_identity.owner_sid 
+			left join acl_class on acl_class.id = acl_object_identity.object_id_class   
+			left join acl_entry on acl_object_identity.id = acl_entry.acl_object_identity 
+			left join acl_sid on acl_entry.sid = acl_sid.id  where ( 
+			
+			
+(acl_object_identity.object_id_identity = ? and acl_class.class = ?)
+ ) order by acl_object_identity.object_id_identity
+			asc, acl_entry.ace_order asc
+			
+			
+			
+			
+
+
+
+
+
+
+======================================
+resource owner			资源拥有者
+resource server			资源服务器
+client					客户端
+authorization server	授权服务器
+
+
+
+----------
+客户端向资源拥有者请求授权: {
+	Authorization code grant: 授权码授权
+}
+客户端拿着拥有者的授权请求授权服务器
+授权服务器颁发token给客户端
+客户端使用token访问资源服务器
+资源服务器发送受保护的资源给客户端

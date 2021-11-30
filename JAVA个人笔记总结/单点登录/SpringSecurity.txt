@@ -92,7 +92,12 @@ Servlet Filter:服务过滤器
 SecurityContextHolder:安全上线文持有至
 	SecurityContext:安全上下文
 		Authentication:授权主体
-			- GrantedAuthority:权限
+			- principal:通常是UserDetails
+			- credentials:通常是密码
+			- authorities:权限对象 接口GrantedAuthority
+			
+			- details:关于验证请求的其他信息，如ip
+			- authenticated:是否授权通过
 			
 身份认证提供者关系
 AuthenticationManger:定义spring security如何执行身份认证
@@ -119,3 +124,46 @@ AbstractSecurityInterceptor
 15.8解决跨域问题
 CorsFilter跨域过滤器
 
+
+configure(HttpSecurity http).addFilter();
+
+
+
+
+FilterChain:[
+	Filter:[
+	],
+	DelegatingFilterProxy:{//允许从容器中查找beanFilter
+		FilterChainProxy:[
+			Security Filters:[
+				SecurityFilter
+			]
+		]
+	}
+]
+
+UsernamePasswordAuthenticationFilter:{
+	ProviderManager:{//未登录校验
+		parent:{
+			ProviderManager//Dao和自定义校验
+		}
+	}
+}
+
+SecurityConfigurer每一个过滤器都有自己的config
+AbstractAuthenticationFilterConfigurer把ProviderManager设置进UsernamePasswordAuthenticationFilter
+
+FormLoginConfigurer创建的UsernamePasswordAuthenticationFilter
+
+
+
+
+AbstractAuthenticationProcessingFilter
+	->requiresAuthentication()拦截指定的url,requiresAuthenticationRequestMatcher(通过子实现类去设置值)
+	->doFilter->
+CaptchaAuthenticationFilter
+	->attemptAuthentication()->
+	创建一个Authentication实现类
+	->获取getAuthenticationManager()执行authenticate(Authentication)校验
+	
+	执行ProviderManager的authenticate

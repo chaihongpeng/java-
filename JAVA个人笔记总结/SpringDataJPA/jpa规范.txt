@@ -1,0 +1,8 @@
+@Entity必须声明
+@Table表明与实体名不一致时声明
+
+@Id主键
+
+@Column字段声明
+
+@Temporal设置为日期类型的字段
