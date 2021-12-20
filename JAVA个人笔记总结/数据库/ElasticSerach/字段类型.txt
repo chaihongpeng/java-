@@ -12,12 +12,141 @@
 		date
 		date_nanos
 	alias现有字段的别名
+	
+词语字段分为两类
+	exact value:精确匹配
+	full text:全文检索
+==============================================================================================================
 
 对象和关系类型
+--------------------------------------------------------------------------------------------------------------
 	object一个json对象
+		object类型在数组中会丢失数据间的关系
+		person:[{
+			name:"cat",
+			age:19
+		},
+		{
+			name:"dog",
+			age:16
+		}]
+		最终会被存储为格式:
+		person:{
+			name:["dog","cat"],
+			age:[119,16]
+		}
+		查询时会将两条数据都搜索出来,所以在数组查询时推荐使用nested类型进行查询:
+		query:{
+			bool:{
+				must:[
+					{
+						match:{
+							person.name:"dog"
+						},
+						match:{
+							person.age:19
+						}
+					}
+				]
+			}
+		}
+		
+----------------------------------------------------------------------------------------------------------------		
 	flattened整个json对象作为某个字段值
+	
+----------------------------------------------------------------------------------------------------------------
 	nested一个json对象，保留其子字段之间的关系
+	搜索方式:
+	{
+		query:{
+			nested:{
+				path:"person",//path的作用,对象查询时,对象中可能还会嵌套对象,path就是指定匹配的位置在哪一层
+				query:{
+					bool:{
+						must:{
+							match:{
+								person.name:"dog"
+							},
+							match:{
+								person.age:"19"
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+----------------------------------------------------------------------------------------------------------------
 	join为同一个索引中的文档定义父子关系
+		定义索引
+		PUT /[index]
+		{
+			mappings:{
+				properties:{
+					my_id:{
+						type:"keyword"
+					},
+					my_join_filed:{
+						type:join,
+						relations:{//指定父子级关系,parent有son和daugher两个子集,son有grandson子集;每个子集的父级是唯一的,每个父级可以有多个子集
+							"my_parent": ["my_son", "my_daugher"],
+							"my_son":["my_grandson"]
+						}
+					}
+				}
+			}
+		}
+		插入数据
+		//插入父亲节点
+		PUT /person/_doc/1?refresh
+		{
+			my_id:1,
+			my_join_filed:{
+				name:"my_parent"
+			}
+		}
+		//插入儿子
+		PUT /person/_doc/2?refresh&routing=1
+		{
+			my_id:"2",
+			my_join_filed:{
+				name:"son",
+				parent:1
+			}
+		}
+		
+		搜素
+		以下语句代表你想搜 李华,李炳 的父亲都有谁
+		GET /person/_search
+		{
+			query:{
+				has_child:{//有孩子的字段,代表你要搜父亲
+					type:"my_son"，//要搜索的孩子类型
+					query:{
+						terms:{
+							"name": ["李华","李炳"]
+						}
+					}
+				}
+			}
+		}
+		
+		以下语句代表搜索你想搜索 李大茂和王二狗 的儿子们都有谁
+		GET /person/_search
+		{
+			query:{
+				has_parent:{//有父亲的数据,代表你要搜儿子
+					parent_type:"my_parent"，//要搜索的父亲类型
+					query:{
+						terms:{
+							name:["李大茂","王二狗"]
+						}
+					}
+				}
+			}
+		}
+----------------------------------------------------------------------------------------------------------------
 结构化数据类型
 	range
 		long_range, double_range, date_range, ip_range.
@@ -40,3 +169,32 @@
 文本类型
 	用于索引全文的字段analyzed,在被索引之前通过分析器将字符串转化为单个术语的列表
 	text适合人类可读的非结构化内容
+	
+	
+mapping parameters
+	index:是否对当前字段创建所以,默认为true;如果不创建则无法以当前字段为关键词进行搜索到数据
+	analyzer:指定分词器
+	boost:设置当前字段的权重,默认情况为1
+	coerce:是否允许被强制类型转换,string转int，boolean转int等隐式类型转换
+	copy_to:默认把当前字段中的内容拷贝到其他指定字段中
+	doc_values:正排所以,用于聚合和排序使用,不支持text、annotated_text字段
+	eager_global_ordinals:用于聚合字段优化
+	enable:是否创建倒排索引,该属性可以使用在字段上也可以在索引上
+	filedata:首次使用当前字段聚合排序或使用脚本时,需要字段为fileddata并创建倒排索引保存到堆中
+	fileds:给一个字段创建多个类型,以提供不同检索使用
+	format:date字段使用,限制数据的格式
+	null_value:空时的默认值
+mapping
+	dynamic:是否可以动态添加新字段
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+	

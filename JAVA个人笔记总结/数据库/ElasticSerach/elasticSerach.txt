@@ -118,7 +118,7 @@ GET /<index>/_search
 		(1)查询所有，相当于select *
 		match_all:{}
 		(2)短语搜索,整个name中要包含这一长串内容
-		match_phrase:{
+		match_phrase:{//短语匹配,被搜索词不会被分词
 			<字段>:<数据>
 		}
 		(3)多字段匹配,一个搜索词可以同时在文章标题和内容中进行搜索
