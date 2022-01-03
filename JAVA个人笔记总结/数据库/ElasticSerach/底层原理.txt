@@ -51,7 +51,7 @@ translog:
 
 segment file:1s中生成一个会导致磁盘文件过多
     - es默认在后台执行merge操作,小的segment会合并成大的segment并剔除原来的segment
-
+    - 
 
 
 
