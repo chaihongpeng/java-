@@ -141,7 +141,7 @@ GET /<index>/_search
 		(6)
 		range:{
 			<字段>:{
-				gt:<范围大于>,
+				gt:<范围大于>,//now-30d,搜索最近30天的数据
 				lt:<范围小于>
 				gte:<大于等于>
 				lte:<小于等于>
@@ -290,7 +290,6 @@ GET /<index>/_search
 		}
 	}
 }
-
 
 
 

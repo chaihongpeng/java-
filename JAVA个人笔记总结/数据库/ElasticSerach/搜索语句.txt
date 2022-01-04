@@ -1,0 +1,206 @@
+GET /<index>/_search
+{
+	query:{
+		match:{
+			<field>:{
+				query:<input value>,
+				operator:<and | or> //指定搜索必须全部匹配还是只需匹配一项
+				minimum_should_match:"75%"//指定query的搜索词被分词后,至少有多少与文章匹配,默认为1
+			}
+		}
+	}
+}
+
+must和should同时存在时,should中的条件默认可以都不满足,但是should可以影响相关度分数
+es默认会将所有的搜索条件分数加起来,取平均值来计算此次搜索的总相关度分数
+
+GET /<index>/_search
+{
+	query:{
+		bool:{
+			must:[...],
+			should:[...],
+			should:[...],
+			minimum_should_match:<number>//指定默认要有多少个should被匹配,没有must 默认值为1,有must时默认值为0
+			
+		}
+	}
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+es的底层转换:
+
+GET /<index>/_search
+{
+	query:{
+		match:{
+			<field>:<input value>,
+			minimum_should_match:"75%"
+		}
+	}
+}
+以上语句会在底层将<input value>进行分词后转换为,operator参数就是指定bool下是should还是must,minimum_should_match:"75%"会根据分词的数量自动指定转化后的minimum_should_match
+GET /<index>/_search
+{
+	query:{
+		bool:{
+			should:[
+				{
+					term:{
+						<field>:<input value分词结果1>
+					}
+				},
+				{
+					term:{
+						<field>:<input value分词结果2>
+					}
+				}
+				minimum_should_match:"2"
+			]	
+		}
+	}
+}
+--------------------------------------------------------------------------------------------------------------------------
+指定权重
+GET /<index>/_search
+{
+	query:{
+		bool:{
+			should:[
+				match:{
+					<field>:{
+						query:<input value>,
+						boost:3
+					}
+				},
+				match:{
+					<field>:{
+						query:<input value>,
+						boost:1
+					}
+				}
+			]
+		}
+	}
+}
+
+在should当中,可以通过boost指定权重进行相关度排序
+
+--------------------------------------------------------------------------------------------------------------------------
+best_fields策略
+
+{
+	query:{
+		bool:{
+			should:[
+				match:{
+					<field:title>:{
+						query:<input value:search string>
+					}
+				},
+				match:{
+					<field:content>:{
+						query:<input value:search string>
+					}
+				}
+			]
+		}
+	}
+}
+
+上面语句计算相关度排序时,会取所有should条件的平均值
+
+如果我想用所有should条件中,相关度分数最大的作为评分可以使用以下方法
+{
+	query:{
+		dis_max:{
+			queries:[
+				match:{
+					<field:title>:{
+						query:<input value:search string>
+					}
+				},
+				match:{
+					<field:content>:{
+						query:<input value:search string>
+					}
+				}
+			],
+			tie_breaker:<0-1>//0-1之间的一个小数,指定除评分最大的那条搜索条件外,考虑其他搜索条件的评分的价值
+		}
+	}
+}
+
+--------------------------------------------------------------------------------------------------------------------------
+GET /<index>/_search
+{
+	query:{
+		multi_match:{
+			query:<input value>,
+			type:<best_fields|most_fields|cross_fields>
+			fields:[<field:title^1>,<field:content>],
+			tie_breaker:<0-1>,
+			minimum_should_match:<50%,number>
+		}
+	}
+}
+
+type: 匹配策略
+	- best_fields: 评分最高的字段决定排行
+	- most_fields: 尽可能多的匹配字段
+	- cross_fields: 
+--------------------------------------------------------------------------------------------------------------------------
+most_fields搜索弊端:
+一个doc,如果title中'李华'只出现过一次,content中'李华','上','大学'出想过很多次,
+搜索词'李华上大学',在multi_match中可能会优先匹配那个title为'李华'的数据,而用户想搜索的'李华','上','大学'因为出现频率较高反而评分变低
+
+解决办法
+- copy_to
+PUT /news/_mapping
+{
+	properties:{
+		first_name:{
+			type:"text",
+			copy_to:"full_name"
+		},
+		last_name:{
+			type:"text",
+			copy_to:"full_name"
+		},
+		full_name:{
+			type:"text"
+		}
+	}
+}
+
+- cross_fields
+GET /<index>/_search
+{
+	query:{
+		multi_match:{
+			query:"Peter Smith",
+			type:"cross_fields",
+			operator:"and",
+			fields:["first_name","last_name"]
+		}
+	}
+}
+
+cross_fields搜索在query分词后同时每一个词项同时尝试匹配 first_name 和 last_name
+operator:"and" 则指定所有分词词项都必须要出现过
+上述多字段搜索可以实现让Peter 和 Smith必须至少出现在过一次
+
+cross_fields会拿query的term在多个field中匹配,在匹配的doc中取最小分的field,避免了一个term在某个field中分数过高的问题
+
+
+
+
+
+
+
+
+
+
+
+
+

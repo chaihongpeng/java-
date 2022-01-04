@@ -1,0 +1,59 @@
+倒排索引的结构:
+    - 包含这个关键词的document list文档列表
+    - 关键词在document count文档总数 IDF(inverse document frequency)
+    - 关键词在document出现次数 TF(term frequency)
+    - 关键词在document中出现的次序 length norm
+    - 包含这个关键词的所有document的平均长度
+
+倒排索引不可变好处:
+    - 不需要加锁
+    - 可以一直保存在内存当中,只要内存足够
+    - filter cache一直驻留在内存,因为数据不变
+    - 可以压缩,节省cpu和io开销
+倒排索引的坏处:
+    - 每次都要重新构建索引
+
+document写入原理:
+    - buffer:数据写入内存是先写入到内存buffer缓冲中,每过一段时间就会执行commit point
+    - commit point:将buffer中的数据写入到新的index segment当中,每一次提交都会生成一个新的segment
+    - index segment:es的底层是lucence,lucence底层的index是分为多个segment的,每个segment存放部分数据;
+    - os cache:写入操作系统缓存
+    - os disk: fsync强制刷新cache到disk当中
+        - 当index segment被fsync后index就会被打开供search使用
+        - 此时内存中的buffer会被清空
+        
+document删除操作:
+    - 删除操作每次提交时会生成一个.del文件,标明这个 index segment中的哪个document被删除了
+    - 下一次搜索请求匹配到被删除的文档,就发现在.del文件中已经被deleted,这种数据就会被过滤掉,也就是伪删除
+    - 更新操作就是将现有的index标记为.del,写入一个新的index下次search时会匹配多个版本的index但是之前的版本已经被删除,只匹配最新的版本
+
+近乎实时写入:
+    - refresh: 数据写入到os cache当中时index就被打开,进而可以被搜索到默认间隔是1s
+    - 也可以在提交操作时通过_refresh参数手动提交参数
+
+es完整原理:
+    - 用户执行写入document操作
+    - 同时执行写入buffer内存缓冲和写入translog日志文件
+    - 每个1s,buffer中的数据就会写入到index segment,并进入到os cache;search请求可以搜索到os cache当中的index segment
+    - buffer被清空
+
+translog:
+    - 随着时间推移translog文件会越来越大
+    - 当大到一定程度就会执行flush操作
+    - 就会执行commit操作
+    - 将buffer中的现有数据全部写入到segment file,并刷入 os cache,供search
+    - 用fsync强行将数据刷入到磁盘当中,现有的translog就会被清空,生成一个新的translog文件
+
+服务器宕机:
+    - translog会存放上一次flush直到最近的数据变更记录
+    - 重新启动后,此时会将translog上的操作重新回放,将数据写入到buffer当中
+    - 注意:translog默认每5s进行一次刷盘,这段时间内宕机也会造成部分数据的丢失
+
+segment file:1s中生成一个会导致磁盘文件过多
+    - es默认在后台执行merge操作,小的segment会合并成大的segment并剔除原来的segment
+    - 
+
+
+
+
+
