@@ -204,3 +204,5 @@ cross_fields会拿query的term在多个field中匹配,在匹配的doc中取最�
 
 
 
+String[] inputValues = {"mop", "moth", "pop", "star", "stop", "top"};
+long[] outputValues = {100, 91, 72, 83, 54, 55};

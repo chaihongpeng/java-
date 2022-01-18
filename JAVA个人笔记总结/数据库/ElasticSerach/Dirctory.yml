@@ -1,0 +1,50 @@
+索引文件锁:
+  实现:
+    - LockFactory:
+        - NoLockFactory: "不加锁,使用者能保证修改总是互斥的时候使用"
+        - SingleInstanceLockFactory: "
+            RAMDirectory默认使用的索引文件锁
+            实现原理,通过write.lock;通过判断锁是否能加入成功
+            释放锁,从locks(HashSet)容器中移除
+          "
+        - FSLockFactory:
+            - SimpleFSLockFactory: "
+              只能用于FSDirectory
+              在索引文件所在目录创建write.lock实现
+              JVM异常退出会导致锁无法释放
+              为了防止write.lock被外力篡改,会记录文件的创建时间
+            "
+            - NativeFSLockFactory:
+                特征: "Directory默认使用的LockFactory"
+                使用范围: "只能用于FSDirectory"
+                加锁流程:
+                  - "通过向Set(Collection.synchronizedSet())写入数据判断进程内是否有其他线程的不同IndexWriter对象占有"
+                  - "使用FileChannel来尝试获得进程间（inter-process）级别的文件锁FileLock"
+
+
+Dictory:
+  介绍: "索引目录不存在多级目录"
+  实现:
+    - BaseDirectory:
+        功能: "提供子类获取索引文件锁方法"
+        实现:
+          - FSDirectory:
+              实现:
+                - SimpleFSDirectory:
+                    打开索引文件: "使用Files的newByteChannel方法打开一个索引文件"
+                    读取索引文件: "读取索引文件FileChannelImpl,随机访问索引文件的一块连续数据"
+                    注意:
+                      - "不支持并发读取"
+                      - "多线程读取,执行线程被打断后,所以文件描述符会关闭"
+                - NIOFSDirectory:
+                    打开文件: "使用Files的FileChannel.open方法来打开一个索引文件"
+                    读取索引文件: "使用FileChannelImpl读取索引文件，使得可以随机访问索引文件的一块连续数据。"
+                - MMapDirectory:
+                    描述: "使用内存映射的方式读取文件"
+                    内存映射I/O技术: "<<Linux/UNIX系统编程手册(下册)>>"
+    FilterDirectory:
+      功能: "增加不同限制"
+      实现:
+        - SleepingLockWrapper:
+            功能: "捕获并发操作的LockObtainFailedException,默认等待1s后重试,如果在重试次数期间仍无法获得索引文件锁，那么抛出LockObtainFailedException异常"
+        - TrackingTmpOutputDirectoryWrapper: "生产.temp临时文件"

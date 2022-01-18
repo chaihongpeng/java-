@@ -1,0 +1,27 @@
+.dvd .dvm存放所有docValues的信息
+
+(max - min)/gcd
+gcd最大公约数,一组数的跨度
+存储格式{5:[3:(150-135)/5,1:(140-135)/5,0:(135-135)/5]}
+
+作用: 用户提供排序规则
+文件后缀: .dvd
+文件结构: header	|	termsValue	|	DocIdData	|	TermsIndex	|	Footer
+
+
+Directory:
+	创建、打开、删除、读取、重命名、同步(持久化索引文件至磁盘)、校验和（checksum computing）
+	索引目录中不存在多级目录
+
+Header	|	SortedDocValues	|	SortedSetDocValues	|	SortedNumericDocValues	|	BinaryDocValues	|	NumericDocValues	|	Footer
+
+倒排索引会存放:
+	文档号,词频,位置,偏移信息
+
+ByteBlockPool:存放倒排表数据
+IntBlockPool:存放索引信息
+ParallelPostingsArray:{
+	int[] termFreqs:词频,
+	int[] lastDocIDs:上一次出现在哪一个文档中
+	int[] lastDocCodes
+}
