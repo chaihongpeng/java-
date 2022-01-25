@@ -25,3 +25,7 @@ ParallelPostingsArray:{
 	int[] lastDocIDs:上一次出现在哪一个文档中
 	int[] lastDocCodes
 }
+
+
+nvd结构
+Header	|	FieldData...:{DocswithFieldData|NormsData}	|	Footer

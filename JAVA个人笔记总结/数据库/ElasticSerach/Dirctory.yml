@@ -48,3 +48,99 @@ Dictory:
         - SleepingLockWrapper:
             功能: "捕获并发操作的LockObtainFailedException,默认等待1s后重试,如果在重试次数期间仍无法获得索引文件锁，那么抛出LockObtainFailedException异常"
         - TrackingTmpOutputDirectoryWrapper: "生产.temp临时文件"
+
+
+Query:
+  特性: "所有子类都会重写createWeight方法,部分重写rewrite方法"
+
+BooleanQuery:
+  BooleanClause.Occur:
+    - MUST: "+"
+    - SHOUD: " "
+    - FILTER: "#"
+    - MUST_NOT: "-"
+  rewrite:
+    作用: "优化查询语句,合并查询内容相同的语句"
+    规则:
+      - 多SHOULD: "评分叠加"
+      - 多MUST: "评分叠加"
+      - FILTER 和 SHOULD: "编程MUST"
+      - FILTER 和 MUST: "MUST"
+  文档合并:
+    - 多个MUST: "取所有集合的交集"
+    - 多个SHOULD: "Bucket[]数组代表从0:,所有的文档,每一个位置数字匹配则加一"
+
+
+
+倒排表:
+  Term结构总结: "
+    termFreqs词频,
+    lastDocIDs上一次文档的id,
+    lastDocCodes文档id|词频是否为1|词频数(词频为1则省略)
+    lastPositions上次文档位置|是否有payload|payload信息
+  "
+  关键类:
+    - ByteBlockPool:
+        属性: "public byte[][] buffers; 用于存放term倒排表数据"
+    - IntBlockPool:
+        属性: "public byte[][] buffers; 一个term的倒排表数据并非存储在连续的空间中,所以需要IntBlockPool映射"
+    - ParallelPostingsArray:
+        概念: "该对象用于处理一种域名的数据,有几个域名就有几个ParallelPostingsArray对象"
+        特征: "该对象中出现的所有的数组的下标值都是termID,termID是区分不同term的唯一标识,它从0开始递增"
+        记录信息: "
+          词频
+          上次出现文档位置
+            词频1使用lastDocCodes存储 (文档位置 <<1 | 词频1)
+            文档>1时,termFreqs存储词频,lastDocIds存储文档ID
+        "
+        属性:
+          - int[] termFreqs: "记录每一个term在一篇文档中的词频frequencies"
+          - int[] lastDocIDs: "
+            记录每一个term上次出现是在哪一个文档中;
+            在某一篇文档中，只有所有该term都被处理结束才会写到倒排表中去
+            否则的话，term在当前文档中的词频frequencies无法正确统计
+            所以每次处理同一个term时，根据它目前所属的文档跟它上一次所属的文档来判断当前的操作是统计词频还是将它写入到倒排表
+            另外包含某个term的所有文档号是用差值存储,该数组用来计算差值
+            "
+          - int[] lastDocCodes: "词频为1时,用于压缩存储termFreqs和lastDocIDs"
+          - int[] lastPositions: "记录term在当前文档上一次出现的位置,文档的位置position使用的差值压缩存储"
+          - int[] textStarts: "term在IntBlockPool中的位置"
+          - int[] intStarts: "数组元素为每一个term在IntBlockPool对象的buffers[ ] [ ] 二维数组中的位置。"
+
+
+nvd:
+  结构:
+    Header:
+    FieldData:
+      DocswithFieldData:
+        block:
+        cardinadlity:
+        docID...:
+      NormsData:
+        Value...: "Value为当前域在每一篇文档中的标准化值。"
+    Footer:
+
+nvm:
+  结构:
+    Header:
+    NumFields...:
+      FieldNumber: "域的编号，用来唯一标识一种域。"
+      DocsWithFieldAddress:
+      DocsWithFieldLength: "如果numDocsWithValue == maxDoc 或者numDocsWithValue == 0，那么DocsWithFieldAddress跟DocsWithFieldLength会被置为固定值。否则这两个值作为索引来映射nvd中的一块数据区域。"
+      NumDocsWithField: "描述了包含当前域的文档个数。"
+      BytesPerNorm: "找出当前域在所有所属文档中的最大跟最小的两个标准化值来判断存储一个标准化值最大需要的字节数，这里还是出于优化索引空间的目的。由于最小值有可能是负数，所以不能仅仅靠最大值来判断存储一个标准化值需要的字节数。比如说最小值min为 -130(需要2个字节)，最大值max为5(需要1个字节)，那么此时需要根据min来决定字节个数。"
+      NormsAddress: "作为索引映射nvd中一块数据区域，这块数据区域即当前域在所有文档中的标准化值。"
+    Footer:
+
+pay:
+  全称: "payload"
+  结构:
+    Header: ""
+    Term...:
+      PackedPayBlock...:
+        TermPayload:
+          PackedPayLengthBlock:
+          SumPayLength:
+          PayData:
+        TermOffset:
+    Footer:
