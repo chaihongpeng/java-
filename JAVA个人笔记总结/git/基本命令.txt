@@ -19,5 +19,12 @@ git diff [本地库的hash] [文件目录] //比较暂存区和本地库的代�
 分支
 git branch [分支名称] //创建分支
 git branch -v //查看分支,你当前使用的分支名称前会显示*
+git branch -r //查看远程分支
 git checkout [分支名称] //切换分支
 git merge [其他分支] //合并其他分支到当前分支
+
+git remote add //添加当前仓库的远程仓库,有了这个动作后git在执行push时就知道代码提交的地方
+
+git fetch //每次commit后都会产生一个commit-id,fetch操作将会更新远程仓库中的所有commit-id,将其记录到.git/FETCH_HEAD文件中
+git fetch [remote_repo] //更新名称为[remote_repo]远程仓库的所有commit-id
+git fetch [remote_repo] [remote_branch_name] //更新指定远程仓库指定分支
