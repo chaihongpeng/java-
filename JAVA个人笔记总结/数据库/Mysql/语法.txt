@@ -1,0 +1,40 @@
+create table <table_name>(
+	<column_name> <column_type> <index_type> default <default_value>,
+)
+例:
+create table if not exists user(
+	id bigint not null primary key,
+	name char(20),
+	gender int not null default 0
+)engine=InnoDB default charset=UTF-8;
+
+alert table <table_name> <drop> <column_name>;//删除字段
+alert table <table_name> <add> <column_name> <column_type>;//添加字段
+alert table <table_name> <modify> <column_name> <column_type>;//修改字段类型
+alert table <table_name> change <column_name_old> <column_name_new> <column_type_new>;//修改字段名称和类型
+alert table <table_name> <modify> <column_name> <column_type> not null default <value>;//修改字段默认值
+alert table <table_name> alert <column_name> set default <value>;//修改字段默认值
+alert table <table_name> alert <column_name> drop default;//删除字段默认值
+alert table <table_name_old> rename to <table_name_new>;//修改表名称
+
+with recursive <alias> as(
+	select sql
+
+)
+
+//创建触发器
+create 
+<definer = { user | current_user}>
+trigger <trigger_name> 
+<trigger_time:{before|after}> 
+<trigger_event:{insert|update|delete}> 
+on <table_name> for each row <trigger_order:{ FOLLOWS | PRECEDES } other_trigger_name //多个触发器的执行书序,在谁之后或之前> <trigger_body>
+
+
+
+if <boolean> 
+then <do something>
+elseif <boolean>
+then <do something>
+else <do something>
+end if

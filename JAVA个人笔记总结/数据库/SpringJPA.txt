@@ -1,0 +1,45 @@
+
+@Embedded平铺对象--加在主表的属性对象上
+
+@Embeddable平铺对象中的属性值--加在子对象上
+@AttributeOverride覆盖原平铺对象中的名称
+class Book{
+	@Id
+	long id;
+	Publisher publisher;
+}
+@Embeddable
+class Publisher{
+	long id;
+}
+
+create table Book(
+	id bigint not null
+	id
+)
+
+
+
+@Id
+@NaturalId
+
+
+@ManyToOne
+
+CascadeType.PERSIST
+	级联保存或更新子类
+	不会执行级联删除
+CascadeType.MERGE
+	
+CascadeType.REMOVE
+	级联删除，父类被删除，子类跟随删除
+CascadeType.DETACH
+	分离操作从父实体传播到子实体
+
+
+Session EntityManager
+
+transient:刚被实例化,数据库没有持久化,没有分配标识符
+managed:与持久化上下文相关联,可能存于数据库也可能不存在
+detached:实体有一个关联标识符,但不在与上下文关联
+removed:有关联标识与持久化上下文关联,但它计划从数据库中移除

@@ -1,0 +1,19 @@
+
+//创建一个function到服务器
+CREATE FUNCTION somefunc(integer, text) RETURNS integer
+AS 'function body text'
+LANGUAGE plpgsql;
+
+//方法体声明
+[ <<label>> ]
+[ DECLARE
+    declarations ]
+BEGIN
+    statements
+END [ label ];
+
+//变量声明
+快中所有使用的变量都必须在DECLARE中声明,唯一的例外是FOR循环遍历整数值范围的循环变量自动声明为整数变量,同样，FOR循环遍历游标结果的循环变量自动声明为记录变量。
+
+//变量声明语法
+name [ CONSTANT ] type [ COLLATE collation_name ] [ NOT NULL ] [ { DEFAULT | := | = } expression ];

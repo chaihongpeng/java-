@@ -1,0 +1,27 @@
+EntityManager:
+	.getReference()懒加载数据
+	.find()立即加载
+	.persist()添加实体
+	.merge()修改实体
+	.remove()移除实体;jpa只能处理托管状态下的实体
+	.flush()刷新上下文
+	
+	.contains()验证托管状态
+	
+处于托管状态的实体可以由应用程序操作,在flush()时修改持久化
+
+
+transient:刚刚被实例化,没有与持久性上下文关联
+managed or persistent:有关联主键,并且与持久化上下文关联;可能在数据库中存在,也可能不存在
+detached:有关联标识,但是不在与持久上下文关联
+removed:具有关联标识符与持久化上下文,但是它计划从数据库中删除
+
+
+级联状态转换
+
+ALL:级联所有
+PERSIST:级联持久化
+MERGE:级联修改
+REMOVE:级联删除
+REFRESH:级联刷新
+DETACH:级联分离
