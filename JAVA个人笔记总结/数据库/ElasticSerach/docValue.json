@@ -22,5 +22,19 @@
     "机制": [
       "当需要处理的域值个数超过 16384 (NUMERIC_BLOCK_SIZE)个时，Lucene会判断采用 多个block存储是否会减少空间的使用。"
     ]
+  },
+  "内存索引": {
+    "单文档": "使用MemoryIndex生成的索引是单文档（single-document）的，所有的索引数据都在同一篇文档中",
+    "结构": [
+      "内存索引文件按照域名来划分",
+      "属于同一个域名的索引又按照Posting、Terms、PointValues、FieldInfo、Norm、DocValues划分(只列出了部分关键内容)",
+      "源码层面使用的TreeMap存储",
+      {
+        "Posting": [
+          "存放的是倒排信息",
+          "基于磁盘的索引中的倒排信息包含了文档号docId、词频frequency、位置position、偏移offset（offset是一个二元组，即startOffset、endOffset）、负载payload共五类信息"
+        ]
+      }
+    ]
   }
 }

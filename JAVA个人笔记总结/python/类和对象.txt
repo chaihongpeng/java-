@@ -1,3 +1,12 @@
-定义类
-class <类名>:
-	pass
+定义类:
+	class <类名>:
+		pass
+
+	class <类名>:
+		
+		<filed_name1> = <value1>
+		<filed_name2> = <value2> 
+		
+		def __init__(self,<filed_name1>,<filed_name2>):
+			self.filed_name1 = filed_name1
+			self.filed_name2 = filed_name2

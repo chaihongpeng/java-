@@ -1,6 +1,3 @@
-权限有问题
-
-
 @Table(name="表名")表名
 @Entity开启实体类
 
@@ -53,3 +50,166 @@ Specification动态条件查询
 
 对象导航查询
 @OneToMany(fetch=FetchType.EAGER)配置加载关系EAGER立即加载，LAZY延迟加载
+
+
+实体类要在多个不同的实体类中进行,而本身又不需要独立生成一个数据库表
+平铺对象属性
+@Embedded加载主类上
+@Embeddable
+
+@AttributeOverrides覆盖子对象的属性
+@AttributeOverride
+
+
+映射枚举
+@Enumerated
+@MapKeyEnumerated
+javax.persistence.EnumType:{
+	ORDINAL:存序号
+	STRING:存名称
+}
+
+自定义转化规则,@Enumerated和AttributeConverter禁止同时使用
+@Convert( converter = GenderConverter.class )
+@Converter
+public static class GenderConverter
+		implements AttributeConverter<Gender, Character> {}
+
+读写转换器
+@ColumnTransformer(
+		read = "decrypt( 'AES', '00', pswd  )",
+		write = "encrypt('AES', '00', ?)"
+	)
+
+
+@Target接口类型关联到实现类上
+
+@Parent从@Embeddable对象中引用所有者实体
+
+@Persister自定义实体持久化器
+
+@Access默认访问策略,如通过get方法或直接通过field获取
+
+
+@ManyToOne
+@JoinColumn
+
+@OneToMany
+
+
+	document:{
+		id;
+		name;
+		step:creatSuccess
+	}
+	-->文件
+	document:{
+		id;
+		name;
+		step:uploadSuccess;
+		source_type:pdf,png,txt;
+		source_uuid:minio;
+	}
+	
+	-->list ::fileprocess interface[
+		isSuport();
+		proccess(inputStream)
+	]
+	
+	document:{
+		id;
+		name;
+		step:uploadSuccess;
+		source_type:pdf,png,txt;
+		source_uuid:minio;
+		file_list:[
+			{
+				minio;
+			}
+			...
+		]
+		text;
+	}
+	
+	document:{
+		id;
+		name;
+		step:uploadSuccess;
+		source_type:pdf,png,txt;
+		source_uuid:minio;
+		file_list:[
+			{
+				minio;
+			}
+			...
+		]
+		text;
+		able:[
+			{
+				KGB_search
+			}
+		]
+	}
+
+	elastic:{
+		KGB,NLP
+	}
+
+
+
+
+	document:{
+		id;
+		name;
+		step:creatSuccess
+	}
+	-->文件
+	document:{
+		id;
+		name;
+		step:uploadSuccess;
+		source_type:pdf,png,txt;
+		source_uuid:minio;
+	}
+	
+	-->list ::fileprocess interface[
+		isSuport();
+		proccess(inputStream)
+	]
+	
+	document:{
+		id;
+		name;
+		step:uploadSuccess;
+		source_type:pdf,png,txt;
+		source_uuid:minio;
+		PDF_file;
+		text;
+	}
+	
+	document:{
+		id;
+		name;
+		step:uploadSuccess;
+		source_type:pdf,png,txt;
+		source_uuid:minio;
+		file_list:[
+			{
+				minio;
+			}
+			...
+		]
+		text;
+		able:[
+			{
+				KGB_search
+			}
+		]
+	}
+
+	elastic:{
+		KGB,NLP
+	}
+	
+
+
