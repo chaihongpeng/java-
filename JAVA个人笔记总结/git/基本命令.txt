@@ -11,6 +11,9 @@ git reset --hard [reflog显示的版本hash值] //回退或前进版本
 rm [文件路径] //删除工作区文件
 git add [被删除的文件原路径] //删除缓存区文件
 git commit -m "" [被删除文件的原路径] //删除本地库文件
+git rm [file] // 将文件从工作区和暂存区中删除
+git rm -f [file] //删除已经存在于暂存区并且修改过的
+git rm  --cached [file] //删除暂存区的文件
 
 代码比较
 git diff [文件路径] //比较暂存区和工作区的代码差异
