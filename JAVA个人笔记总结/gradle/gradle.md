@@ -68,9 +68,140 @@
         - 通过插件添加到project中的约定属性convertion
         - 在task中定义的属性
         - 从ext父类继承的属性
+      
       - project中常用属性
         - group定义项目的组
-
+      
+      - projiect 中的方法
+      
+        - 寻找方法的顺序和寻找属性的顺序是相同的
+      
+        - buildscript{}为gradle提供构建脚本,写在配置文件的最前面;
+      
+          - gradle如使用docker构建等需要的插件时在buildscript中编写
+          - buildscript和app的依赖是分开的
+      
+        - ```groovy
+          buildscript{
+              //负责给当前项目构建脚本提供依赖
+              repositories{
+                  //执行顺序从上到下,先去本地仓库寻找,没有找到再去阿里云仓库,最后到maven中央仓库寻找
+                  mavenLocal()
+                  maven{
+                      url "https://maven.aliyun.com/repository/public"
+                  }
+                  mavenCentral()
+              }
+              dependcies{
+                  //classpath 指定依赖的路径
+                  classpath "com.bmuschko:gradle-docker-plugin:3.3.4"
+              }
+          }
+          //负责给当前项目应用提供依赖
+          dependcies{
+              implementation "com.google.guava:guava:23.0"
+              mygroup "junit:junit:4.12"
+          }
+          ```
+      
+        - ```groovy
+          //定义插件的方法
+          apply plugin:'java'
+          plugins{
+              id 'java-library'
+          }
+          
+          //用于配置,作用是定义分组,在repositories中使用对应的分组引入依赖,不同的分组在不同的环境中使用
+          configurations{
+              //由plugin "java"插件默认提供了implementation, testRuntime等分组
+              myGroup
+              //分组可以继承,自定义分组myImplementationGroup就拥有了implementation的特性
+              myImplementationGroup.extendsFrom(implementation)
+          }
+          //负责给当前项目应用提供依赖
+          dependcies{
+              implementation "com.google.guava:guava:23.0"
+              //我们自定义的分组,需要注意我们需要写自定义分组的实现,才能对分组进行处理
+              mygroup "junit:junit:4.12"
+          }
+          
+          //对configurations进行扩展
+          task xx {
+              //一下代码可以打印自定义分组引入的依赖的所有真实路径
+              println configuration.myImplementation.asPath
+              def libPath = projectDir.absolutePath + "/src/main/lib"
+              //将依赖包拷贝到指定目录
+              copy {
+                  from configuration.myImplementation.myImplementation.files.first()
+                  into libPath
+              }
+          }
+          ```
+      
+        - ```groovy
+          //仓库
+          repositories{
+              //配置有密码的仓库
+              maven(){
+                  credentials {
+                      username=""
+                      password =""
+                  }
+                  url = ""
+              }
+              repositories {
+                  flatDir(dir:"../lib",name:"libs dir")
+                  flatDir {
+                      dirs '',''
+                      name = 'dirs'
+                  }
+              }
+          }
+          ```
+      
+        - ```groovy
+          //gradle可以通过dependencies命令查看包的依赖关系
+          dependencies {
+              //complie已经过时了,推荐使用implementation
+          	implementation 'com.goole.guava:11.0.2'
+              //排除依赖
+              implementation('org.slf4j-simple:1.6.4') {
+                  exclude 'org.sl4j-api'
+              }
+              //依赖其他模块
+              implementation project(':projectA')
+              //依赖文件树下的所有文件
+              implementation fileTree(dir:'libs',include:['*.jar'])
+              
+              implementation ('com.goole.guava:guava:11.0.2'){
+                  //在版本冲突情况下有限使用该版本
+                  isForce = true
+                  //禁用依赖传递
+                  transitive = false
+              }
+          }
+          ```
+      
+        - ```groovy
+          allprojects{
+              
+          }
+          ```
+      
+        - 
+      
+        - 
+      
+        - 常用分组
+      
+          - api
+          - implementation
+            - implementation继承自api,api有的特性,implementation也都有
+            - api具有传递性 例: a实现b, b实现c, api对于所有人都是透明的, c可以使用a中任何方法
+            - 而implementation则是封闭的,c无法调用a中的方法
+            - compileOnly仅在编译时使用, 如lombok
+            - runtimeOnly仅在运行时使用, 一些包在编译时不使用,运行时使用
+            - testComplieOnly, testImplementation, testRuntimeOnly测试环境使用
 
 ## Task
 
