@@ -183,17 +183,75 @@
           ```
       
         - ```groovy
+          //用于配置此项目以及每个子项目所需的依赖,多模块项目把公共的部分提取出来
           allprojects{
+              //依赖管理器
+              dependencyManageement{
+              }
+          }
+          ```
+          
+        - ```groovy
+          //配置项目目录结构
+          //官方默认读取
+          //src/main
+          //	src/main/java
+          //	src/main/resources
+          sourceSets{
+              mian {
+                  //将源码路径更换为src/java
+                  java {
+                      srcDirs = ['src/java']
+                  }
+                  //将资源路径跟换为src/resources
+                  resources {
+                      //srcDirs彻底改变源码集编译路径,默认的路径
+                      //srcDir添加某个文件夹到源码集中
+                      //exclude从某个源码集目录中排除某个目录,让其不在classes目录下
+                      srcDirs = ['src/resources']
+                      srcDir = ''
+                      //将某个目录下的资源都不打包到项目中
+                      exclude 'cert/**'
+                  }
+              }
+          }
+          ```
+        
+        - ```groovy
+          //使用sourceSets生成一个集成测试目录
+          sourceSets {
+              //inTest这个名字与定义目录一直,就可以直接自动识别
+              inTest {
+                  //把main中的代码添加到集成测试中
+                  compileClasspath += sourceSets.main.output
+                  runtimeClasspath += sourceSets.main.output
+              }
+          }
+          
+          configurations {
+              //这里因为约定, intTest + Implementation 的命名自动找到依赖
+              intTestImplementation.extendsFrom(implementation)
+              intTestimpRuntimeOnly.extendsFrom(runtimeOnly)
+          }
+          
+          //定义任务,自动跑完所有的集成测试
+          task intergrationTest(type Test) {
+              //定义描述
+              description("Run intergrationTest")
+              //定义一个组,idea的gradle插件将会把他放入适合的组中,而不是others中
+              group("verification")
+              
+              
               
           }
           ```
-      
+        
         - 
-      
+        
         - 
-      
+        
         - 常用分组
-      
+        
           - api
           - implementation
             - implementation继承自api,api有的特性,implementation也都有
