@@ -49,11 +49,12 @@
     <?xml version="1.0"?>
     <configuration>
         <!--指定MR走shuffle-->
+        <!--value只能是0-9a-z_不能有-线-->
         <property>
             <name>yarn.nodemanager.aux-services</name>
-            <value>mapreduce-shuffle</value>
+            <value>mapreduce_shuffle</value>
         </property>
-        <!--指定Resource的地址-->
+        <!--指定ResourceManager的地址-->
         <property>
             <name>yarn.resourcemanager.hostname</name>
             <value>localhost</value>
@@ -68,7 +69,7 @@
     </configuration>
     
     ```
-
+    
   - core-site.xml整体核心配置
 
     ```xml
