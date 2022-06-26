@@ -54,9 +54,84 @@
 
     //其中KEYIN, VALUEIN, KEYOUT, VALUEOUT分别对应偏移量,行内容,输出Key,输出Value    
     public class MapperLesson extends Mapper<LongWritable, Text, Text, IntWritable> {
+        // Text存储类是可以复用的
+        final Text keyOut = new Text();
+        final IntWritable valueOut = new IntWritable();
         
+        @Override
+        protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+            String line = value.toString();
+            String[] words = line.split(" ");
+            for (String word : words) {
+                keyOut.set(word);
+                valueOut.set(1);
+                context.write(keyOut, valueOut);
+            }
+        }
     }
-
+    ```
+  - 编写reducer
+    ```java
+    package com.chp.kafka;
+    
+    import org.apache.hadoop.io.IntWritable;
+    import org.apache.hadoop.io.Text;
+    import org.apache.hadoop.mapreduce.Reducer;
+    
+    import java.io.IOException;
+    
+    public class ReducerLesson extends Reducer<Text, IntWritable, Text, IntWritable> {
+        IntWritable valueOut = new IntWritable();
+    
+        @Override
+        protected void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
+            int sum = 0;
+            for (IntWritable value : values) {
+                sum += value.get();
+            }
+            valueOut.set(sum);
+            context.write(key, valueOut);
+        }
+    }
+    ```
+  - 编写driver
+    ```java
+    package com.chp.kafka;
+    
+    import org.apache.hadoop.conf.Configuration;
+    import org.apache.hadoop.fs.Path;
+    import org.apache.hadoop.io.IntWritable;
+    import org.apache.hadoop.io.Text;
+    import org.apache.hadoop.mapreduce.Job;
+    import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+    import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+    
+    import java.io.IOException;
+    
+    public class DriverLesson {
+        public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
+            //1. 获取job
+            Configuration configuration = new Configuration();
+            Job job = Job.getInstance(configuration);
+            //2. 设置Jar路径
+            job.setJarByClass(DriverLesson.class);
+            //3. 关联mapper和reducer
+            job.setMapperClass(MapperLesson.class);
+            job.setReducerClass(ReducerLesson.class);
+            //4. 设置map输出的k,v类型
+            job.setMapOutputKeyClass(Text.class);
+            job.setMapOutputValueClass(IntWritable.class);
+            //5. 设置最终输出的k,v类型
+            job.setOutputKeyClass(Text.class);
+            job.setOutputValueClass(IntWritable.class);
+            //6. 设置输入路径和输出路径
+            FileInputFormat.setInputPaths(job, new Path("D:\\test\\test.txt"));
+            FileOutputFormat.setOutputPath(job, new Path("D:\\test\\output.txt"));
+            //7. 提交job,可以直接使用submit,waitForCompletion在提交后仍会获取处理的信息
+            boolean result = job.waitForCompletion(true);
+            System.exit(result ? 0 : 1);
+        }
+    }
     ```
 
 
