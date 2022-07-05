@@ -79,8 +79,6 @@
         <!--指定NameNode地址-->
         <property>
             <name>fs.defaultsFS</name>
-            <!--注意在新的版本中此参数被更换为-->
-            <name>fs.default.name</name>
             <value>hdfs://127.0.0.1:8020</value>
         </property>
         <!--指定hadoop数据存储目录-->
@@ -95,13 +93,13 @@
         </property>
     </configuration>
     ```
-
+    
     - workers配置每个集群host
 
     ```
-    127.0.0.1
+  127.0.0.1
     ```
-
+    
     
 
 - sbin:
@@ -122,5 +120,17 @@
   sbin/start-dfs.sh
   ```
 
+  ```shell
+  #配置环境hadoop-env.sh
+  export JAVA_HOME=/opt/modules/jdk-11
+  export HDFS_SECONDARYNAMENODE_USER=root
+  export HDFS_DATANODE_USER=root
+  export HDFS_DATANODE_USER=root
+  export YARN_RESOURCEMANAGER_USER=root
+  export YARN_NODEMANAGER_USER=root
+  export HDFS_NAMENODE_USER=root
+  
+  ```
+  
   
 
