@@ -134,3 +134,11 @@
   
   
 
+# 免密登陆
+
+```shell
+# 生成秘钥
+ssh-keygen -t rsa
+ssh-copy-id <host>
+```
+
