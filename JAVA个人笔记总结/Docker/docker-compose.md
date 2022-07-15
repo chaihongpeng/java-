@@ -39,13 +39,32 @@ curl -SL https://github.com/docker/compose/releases/download/v2.6.1/docker-compo
    #运行docker-compose脚本
    docker compose up
    ```
-   
+
 #### Compose ENV
+
 在编写docker-compose.yml文件时, 可以使用`${JAVA_HOME}`来引用`.env`文件中的环境变量
 
-```properties
+```dotenv
 JAVA_HOME=/opt/modules/java-11
 ```
 
+#### Command-line
 
+```sh
+# 打印docker-compose日志
+# -f 追踪日志输出, 实时更新日志
+# -t 展示时间戳
+# --tail all 从每个容器的日志末尾开始显示的行数
+# --until 在时间戳之前显示日志
+docker compose logs
 
+# 重新构建, 启动和附加到容器
+# --detach -d 后台运行
+docker compose up
+
+# 构建或重建服务
+docker compose build
+
+# 停止容器并且移除由up命令创建的容器, 网络, 数据卷和镜像
+docker compose down 
+```
