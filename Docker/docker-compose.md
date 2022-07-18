@@ -1,4 +1,11 @@
+#### Document
 单机多容器的部署工具
+docker-compose概念组成
+- 一个文件 docker-compose.yml
+- 两个要素
+  - 服务(service): 服务就是docker中的容器
+  - 工程(project): 多个服务组成的一个完整的业务单元
+
 
 #### Install
 
@@ -68,3 +75,31 @@ docker compose build
 # 停止容器并且移除由up命令创建的容器, 网络, 数据卷和镜像
 docker compose down 
 ```
+
+#### docker-compose.yml
+
+```yaml
+verson: 3 #docker compose的版本
+
+services: # 服务列表
+  webapp: #指定服务名
+    build: . #使用指定路径的Dockerfile文件进行构建
+    
+    build:
+      # 指定Dockerfile文件所在目录
+      context: .
+      # 指定Dockerfile文件的别名
+      dockerfile: webapp.Dockerfile
+      # args定义Dockerfile的构建参数
+      # ARG HADOOP_DIR
+      # RUN echo $HADOOP_DIR
+      args:
+        # 写法一
+        HADOOP_DIR: /opt/moduls/hadoop-3.3.3
+        # 写法二
+        - HADOOP_DIR=/opt/moduls/hadoop-3.3.3
+      ssh:
+        - def
+      
+```
+
