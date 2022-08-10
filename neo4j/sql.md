@@ -188,6 +188,101 @@ AND NOT exists((friend)-[:WORKS_FOR]->(:Company))
 RETURN friend.name;
 ```
 
+#### Query Processing
+
+```cypher
+//count()计数twitter非空的人
+MATCH (p:Person) RETURN count(p.twitter);
+//count()计数所有人
+MATCH (p:Person) RETURN count(*);
+                              
+//collect()将指定的值聚合到列表中
+//根据测试,neo4j会检测剩余的部分数据是否完全相同进而进行分组后在执行collect()
+MATCH (p:Person)-[:IS_FRIENDS_WITH]->(friend:Person)
+RETURN p.name, collect(friend.name) AS friend;
+
+//size() 获取列表的值
+MATCH (p:Person)-[:IS_FRIENDS_WITH]->(friend:Person)
+RETURN p.name, collect(friend.name) AS friend;
+
+//WITH 将子句值从一部分传递到另一部分
+MATCH (a:Person)-[r:LIKES]-(t:Technology)
+WITH a.name AS name, collect(t.type) AS technologies
+RETURN name, technologies;
+
+//unwind 和collect()作用相反,用于将集合拆解开
+WITH ['Graphs','Query Languages'] AS techRequirements
+UNWIND techRequirements AS technology
+MATCH (p:Person)-[r:LIKES]-(t:Technology {type: technology})
+RETURN t.type, collect(p.name) AS potentialCandidates;
+
+//ORDER BY 排序
+unwind [6,7,9,1,44,11,3] as item
+return item order by item
+
+//distinct 去重
+MATCH (user:Person)
+WHERE user.twitter IS NOT null
+WITH user
+MATCH (user)-[:LIKES]-(t:Technology)
+WHERE t.type IN ['Graphs','Query Languages']
+RETURN DISTINCT user.name
+
+//limit 限制
+MATCH (p:Person)-[r:IS_FRIENDS_WITH]-(other:Person)
+RETURN p.name, count(other.name) AS numberOfFriends
+ORDER BY numberOfFriends DESC
+LIMIT 3
+```
+
+#### SubQuery
+
+```cypher
+// 子查询
+MATCH (p:Person)-[r:IS_FRIENDS_WITH]->(friend:Person)
+WHERE exists((p)-[:WORKS_FOR]->(:Company {name: 'Neo4j'}))
+RETURN p, r, friend
+
+//EXISTS子句
+MATCH (p:Person)-[r:IS_FRIENDS_WITH]->(friend:Person)
+WHERE EXISTS {
+  MATCH (p)-[:WORKS_FOR]->(:Company {name: 'Neo4j'})
+}
+RETURN p, r, friend
+
+//使用and连接的子查询之间变量不互通
+//执行下面例子会报错,找不到t
+MATCH (person:Person)-[:WORKS_FOR]->(company)
+WHERE company.name STARTS WITH "Company"
+AND (person)-[:LIKES]->(t:Technology)
+AND size((t)<-[:LIKES]-()) >= 3
+RETURN person.name as person, company.name AS company;
+//以下方式可以获取到t
+MATCH (person:Person)-[:WORKS_FOR]->(company)
+WHERE company.name STARTS WITH "Company"
+AND EXISTS {
+  MATCH (person)-[:LIKES]->(t:Technology)
+  WHERE size((t)<-[:LIKES]-()) >= 3
+}
+RETURN person.name as person, company.name AS company;
+
+//call可以将返回值进行组合并去重
+CALL {
+	MATCH (p:Person)-[:LIKES]->(:Technology {type: "Java"})
+	RETURN p
+
+	UNION
+
+	MATCH (p:Person)
+	WHERE size((p)-[:IS_FRIENDS_WITH]->()) > 1
+	RETURN p
+}
+RETURN p.name AS person, p.birthdate AS dob
+ORDER BY dob DESC;
+```
+
+
+
 
 
 
