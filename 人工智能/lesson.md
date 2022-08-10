@@ -10,6 +10,51 @@
   - $D$代表数据集$data\ set$
   - $x$代表示例
 - 示例由$d$个属性描述, 每个示例$x_i=(x_{i1};x_{i2};\cdots;x_{i_d})$是$d$维样本空间$X$中的一个向量,$x\in X$
-  - $d$代表维数
+  - $d$代表维数(dimensionality)
   - $x_{i}$代表示例(instance/sample)
 - 其中$x_{ij}$是$x_i$在第$j$个属性上的取值
+
+
+
+- 学习(learning)/训练(training): 从数据中学得模型的过程
+- 训练数据(training data): 训练过程中使用的数据
+- 训练样本(training sample): 训练数据中的每一个样本成为训练样本
+- 训练集合(training set): 训练样本组成的集合称为训练集
+- 假设(hypothesis): 学得模型对应了关于数据的某种潜在规律
+- 真相/真实(ground-truth): 这种潜在规律称为真相或真实
+- 学习器(learner): 模型
+- 预测(prediction)
+- 标记(label): 事例的结果
+- 样例(example): 拥有标记信息的示例
+- 一般用$(x_i,y_i)$表示第$i$个样例, 其中$y_i\in Y$表示是示例$x_i$的标记,$Y$是所有标记的集合
+- 标记空间(label space)/输出空间: 所有标记集合
+
+
+
+- 分类(classification): 预测离散值的学习任务
+  - 二分类(binary classification): 只涉及两个类别, 一般为"正类"和"负/反类"
+  - 多分类(multi-class classification): 涉及多个类别
+- 回归(regression): 预测连续值的学习任务
+
+
+
+- 聚类(clustering): 对训练集进行分组
+- 组(cluster): 每个组
+
+
+
+- 监督学习(supervised learning)
+- 无监督学习(unsupervised learning)
+
+
+
+- 泛化(generalization): 学得模型适用于新样本的能力
+
+
+
+## 假设空间
+
+科学推理的两大基本手段
+
+- 归纳(induction):从特殊到一般的泛化过程, 及从具体的事实归结出一般性规律
+- 演绎(deduction): 从一般到特殊的"特化"过程, 及从基本原理推演出具体状况
