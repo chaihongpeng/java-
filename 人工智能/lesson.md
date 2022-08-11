@@ -73,6 +73,10 @@
 
 给定$d$个属性描述示例$x=(x_1;x_2;\cdots;x_i)$其中$x_i$是$x$在第$i$个属性上的取值
 
+## 逻辑回归
+
+
+
 ## 决策树
 
 信息熵 $Ent(D)=-\sum\limits_{k=1}^{|Y|}p_k\log_2p_k$
@@ -95,17 +99,20 @@ M-P神经元模型
 
 感知机能够容易的实现逻辑与或非运
 
-$y=f(\sum_iw_ix_i-\theta_j)$
+$$
+t=f(\sum_{i=1}^nw_ix_i+b)=f(w^Tx)\\
+f(n)=
+\begin{cases}
++1 & if\ n\ge0\\
+-1 & otherwise
+\end{cases}\\
+w=[w_1\ w_2\ \cdots\ w_n \ b]^T\\
+x=[x_1\ x_2\ \cdots\ x_n\ 1]^T
+$$
+
 
 与 $y=f(x_1+x_2-2)$ 条件$w_1=w_2=1,\theta=2$
 
 或 $y=f(x_1+x_2-0.5)$ 条件$w_1=w_2=1,\theta=0.5$
 
 非 $y=f(-0.6x_1+0.5)$ 条件$w_1=-0.6,w_2=0,\theta=-0.5$
-
-
-
-
-
-
-
