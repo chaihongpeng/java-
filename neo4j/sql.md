@@ -281,15 +281,27 @@ RETURN p.name AS person, p.birthdate AS dob
 ORDER BY dob DESC;
 ```
 
+# 函数
 
+## 谓语函数
 
+谓语函数是对于给定非空集合输入返回`true`或`false`的布尔函数
 
+### all
 
+```cypher
+//循环遍历集合中的元素是否全部符合
+MATCH p = (a)-[*1..3]->(b)
+WHERE
+  all(x IN nodes(p) WHERE x.age > 30)
+RETURN p
+```
 
+### any
 
-
-
-
-
-
+```cypher
+MATCH (n)
+WHERE any(color IN n.liked_colors WHERE color = 'yellow')
+RETURN n
+```
 
