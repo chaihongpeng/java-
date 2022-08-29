@@ -305,3 +305,50 @@ WHERE any(color IN n.liked_colors WHERE color = 'yellow')
 RETURN n
 ```
 
+
+
+# 列表
+
+## 创建列表
+
+```cypher
+// 使用方括号并用逗号分隔列表中的元素创建列表
+return [0, 1, 2, 3, 4]
+// range()函数生成列表
+return range(0, 10)
+```
+
+## 索引
+
+```cypher
+// 使用方括号和索引值再次访问列表单个元素
+return [1,2,3,4][2];
+// 使用负数从列表尾部开始索引
+return [1,2,3,4][-1]
+                           
+// 使用[index_start..index_end]截取范围列表
+return [1,2,3,4][0..3]
+return [1,2,3,4][0..]
+return [1,2,3,4][..3]
+```
+
+索引超出下标范围, 单个返回元素`null`, 切片返回索引内的所有有效元素
+
+## 长度
+
+```cypher
+//获取数组长度
+return size([1,2,3,4])
+```
+
+##  数组遍历
+
+```cypher
+// 遍历数组元素, 通过where过滤, 通过 | 进行映射处理
+return [item in range(0,10) where item%2=0 | item*3]
+// 过滤
+return [item in range(0, 10) where item % 2 = 0]
+// 映射
+return [item in range(0, 10) | item *2]
+```
+
