@@ -1,5 +1,0 @@
-Index:{
-	node: Node,
-	down: Index,
-	right: Index,
-}
