@@ -1,13 +1,14 @@
-#### Document
+## Document
+
 单机多容器的部署工具
 docker-compose概念组成
+
 - 一个文件 docker-compose.yml
 - 两个要素
   - 服务(service): 服务就是docker中的容器
   - 工程(project): 多个服务组成的一个完整的业务单元
 
-
-#### Install
+## Install
 
 官网:https://docs.docker.com/compose/install/
 获取docker-compose同时完成自动安装过程
@@ -18,7 +19,7 @@ mkdir -p $DOCKER_CONFIG/cli-plugins
 curl -SL https://github.com/docker/compose/releases/download/v2.6.1/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose
 ```
 
-#### Getting Started
+## Getting Started
 
 1. 编写自己的`dockerFile`
 
@@ -101,5 +102,65 @@ services: # 服务列表
       ssh:
         - def
       
+```
+
+## Compose file
+
+默认读取顺序`compose.yaml`,`compose.yml`,`docker-compose.yaml`,`docker-compose.yml`
+
+### 环境Profiles
+
+```yaml
+services:
+  foo:
+    image: foo
+  bar:
+    image: bar
+    profiles:
+      - test
+  baz:
+    image: baz
+    depends_on:
+      - bar
+    profiles:
+      - test
+  zot:
+    image: zot
+    depends_on:
+      - bar
+    profiles:
+      - debug
+```
+
+### 顶级命名
+
+```yaml
+services:
+  foo:
+    image: busybox
+    environment:
+      - COMPOSE_PROJECT_NAME
+    command: echo "I'm running ${COMPOSE_PROJECT_NAME}"
+```
+
+### 顶级元素
+
+```yaml
+# 顶级元素
+services:
+	# 顶级命名
+  frontend:
+    image: awesome/webapp
+    networks:
+      - front-tier
+      - back-tier
+# 顶级元素
+volumes:
+	# 顶级命名
+  db-data:
+    driver: flocker
+networks:
+  front-tier: {}
+  back-tier: {}
 ```
 
