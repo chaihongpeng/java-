@@ -164,3 +164,54 @@ networks:
   back-tier: {}
 ```
 
+## Docker
+
+### container_name
+
+指定自定义容器的名称
+
+### image
+
+指定启动容器的镜像
+
+### command
+
+覆盖容器镜像的默认命令(Dockerfile CMD)
+
+### environment
+
+定义容器中的环境变量
+
+# Compose命令
+
+```sh
+# 用法
+docker compose [options] [command] [args...]
+```
+
+## Options
+
+```sh
+docker compose -f,--file FILE #指定一个compose文件,默认使用docker-compose.yml
+```
+
+## Commands
+
+```sh
+# 启动[service]服务, 并以[command]命令运行
+docker compose run [options] [service] [command] [args...]
+```
+
+```sh
+# 启动或重启所有定义的服务
+docker compose up [options] [service...]
+# options
+-d --detach # 后台运行程序
+```
+
+```sh
+# 停止容器并且移除所有通过up创建的容器,镜像,网络,数据卷
+docker compose down [options]
+-v --volumes # 移除compose声明的数据卷和容器的匿名数据卷
+```
+
