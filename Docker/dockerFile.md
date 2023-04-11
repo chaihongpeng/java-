@@ -28,7 +28,7 @@ MAINTAINER chp
 ```dockerfile
 # 在镜像中安装一个vim
 RUN yum -y install vim
-RUN ["yum" "-y" "install" "vim"]
+RUN ["yum", "-y", "install", "vim"]
 ```
 
 #### EXPOSE
@@ -55,6 +55,14 @@ WORKDIR /opt/modules/hadoop
 
 ```dockerfile
 ENV JAVA_HOME /opt/modules/java
+```
+
+#### ARG
+
+指定定义一个变量, 用户可以在构建时使用
+
+```dockerfile
+ARG custom_arg=custom_value
 ```
 
 #### VOLUME
